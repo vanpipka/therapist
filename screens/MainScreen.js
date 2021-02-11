@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Platform, Alert, ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, FlatList } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View} from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
-import { AssetExample, Login, GetSessionInfo, GetOrders } from '../components/WebAPI';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { Card, ListItem, Button, Icon } from 'react-native-elements'
-import Urls from '../constants/Urls';
-import Const from '../constants/Const';
 import Swiper from 'react-native-swiper'
 
-class Main extends React.PureComponent {
+export default class Main extends React.PureComponent {
 
   constructor(props) {
       super(props);
@@ -26,7 +23,13 @@ class Main extends React.PureComponent {
   render() {
       return (
         <View style={styles.container}>
-          <Swiper style={styles.wrapper} showsButtons={true}>
+          <View style={{alignItems: 'center', height: 40}}>
+            <Icon
+              name='people'
+              color='#90ee90' />
+          </View>
+          <Swiper style={styles.wrapper}
+            activeDotColor='#90ee90'>
             <View style={styles.slide1}>
               <Text style={styles.text}>Hello Swiper</Text>
             </View>
@@ -37,7 +40,16 @@ class Main extends React.PureComponent {
               <Text style={styles.text}>And simple</Text>
             </View>
           </Swiper>
-          <View>
+          <View style={{height: 100, marginTop: 8}}>
+            <Button
+              title="Начать"
+              buttonStyle={{backgroundColor:'#90ee90'}}
+              onPress={() => this.props.navigation.navigate('Login')}
+              />
+            <View style={{flexDirection: 'row', marginTop: 16}}>
+              <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
+              <Text style={{fontWeight: '700', color: '#90ee90'}}> Войти</Text>
+            </View>
           </View>
         </View>
       );
@@ -45,46 +57,34 @@ class Main extends React.PureComponent {
 
 }
 
-const AppStack = createStackNavigator({ Main: Main});
-
-export default createAppContainer(createSwitchNavigator(
-  {
-    AuthLoading: Main,
-    App: AppStack,
-  },
-  {
-    initialRouteName: 'AuthLoading',
-  }
-));
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0073A8',
+    paddingTop: 40,
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  wrapper: {},
+  wrapper: {
+
+  },
   slide1: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#9DD6EB'
   },
   slide2: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#97CAE5'
   },
   slide3: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#92BBD9'
   },
   text: {
-    color: '#fff',
+    color: '#90ee90',
     fontSize: 30,
     fontWeight: 'bold'
   }

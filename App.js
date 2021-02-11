@@ -1,10 +1,22 @@
-import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-//import * as Icon from '@expo/vector-icons'
+import * as React from 'react';
+import { Platform, StatusBar, StyleSheet, View, Text } from 'react-native';
 import * as Font from 'expo-font';
 import { Asset } from 'expo-asset';
 import AppLoading from 'expo-app-loading';
-import AppNavigator from './navigation/AppNavigator';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Main from './screens/MainScreen';
+import Login from './screens/LoginScreen';
+
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Home Screen</Text>
+    </View>
+  );
+}
+
+const Stack = createStackNavigator();
 
 export default class App extends React.Component {
   state = {
@@ -24,7 +36,22 @@ export default class App extends React.Component {
       return (
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <AppNavigator />
+          <NavigationContainer>
+            <Stack.Navigator
+            screenOptions={{headerShown: false}}
+            initialRouteName="Home">
+              <Stack.Screen
+                name="Home"
+                component={Main}
+                options={{headerMode: 'none'}}
+              />
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{headerMode: 'none'}}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
         </View>
       );
     }

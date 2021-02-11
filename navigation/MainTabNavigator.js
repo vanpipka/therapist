@@ -5,8 +5,8 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 //import Urls from '../constants/Urls';
 import { Icon } from 'react-native-elements'
-import Main from '../screens/MainScreen';
-
+import MainStack from '../screens/MainScreen';
+import Login from '../screens/LoginScreen';
 
 /*const AuthLoginStack = createStackNavigator({
   Settings: LoginScreen,
@@ -61,11 +61,11 @@ export default createBottomTabNavigator({
     },);
 */
 
-const MainStack = createStackNavigator({
-  LoginScreen: Main,
+const MainStackNavigator = createStackNavigator({
+  MainScreen: MainStack,
 },{headerMode: 'none'});
 
-MainStack.navigationOptions = {
+MainStackNavigator.navigationOptions = {
   tabBarLabel: 'Настройки',
   //tabBarIcon: ({ focused }) => (
   //  <TabBarIcon
@@ -76,8 +76,9 @@ MainStack.navigationOptions = {
   //),
 };
 
+
 export default createStackNavigator({
-      MainStack,
+      MainStackNavigator,
     },{
       headerMode: 'none',
       tabBarOptions: {
