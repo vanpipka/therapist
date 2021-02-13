@@ -12,7 +12,7 @@ import { Input } from 'react-native-elements';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
 
-export default class Login extends React.PureComponent {
+export default class News extends React.PureComponent {
 
   constructor(props) {
       super(props);
@@ -33,27 +33,9 @@ export default class Login extends React.PureComponent {
 
   render() {
       return (
-        <View style={styles.container}>
-          <Input
-             placeholder="8 (999) 900 90 90"
-             label="Номер телефона"
-             style={styles}
-             onChangeText={value => this.setState({ comment: value })}
-          />
-
-          <Input
-              placeholder="*********"
-              secureTextEntry={true}
-              label="Код подтверждения"
-          />
-
-          <Button
-            title="Зарегистрироваться"
-            buttonStyle={{backgroundColor:'#90ee90'}}
-            onPress={() => this.props.navigation.navigate('Main')}
-          />
-
-      </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>NEWS!</Text>
+        </View>
     );
   };
 

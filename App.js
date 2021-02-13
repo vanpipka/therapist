@@ -5,16 +5,9 @@ import { Asset } from 'expo-asset';
 import AppLoading from 'expo-app-loading';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Main from './screens/MainScreen';
+import Begin from './screens/BeginScreen';
 import Login from './screens/LoginScreen';
-
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
+import Main from './screens/MainScreen';
 
 const Stack = createStackNavigator();
 
@@ -38,17 +31,21 @@ export default class App extends React.Component {
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           <NavigationContainer>
             <Stack.Navigator
-            screenOptions={{headerShown: false}}
-            initialRouteName="Home">
+            initialRouteName="Begin">
               <Stack.Screen
-                name="Home"
-                component={Main}
-                options={{headerMode: 'none'}}
+                name="Begin"
+                component={Begin}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="Login"
                 component={Login}
-                options={{headerMode: 'none'}}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Main"
+                component={Main}
+                options={{ headerShown: false }}
               />
             </Stack.Navigator>
           </NavigationContainer>
