@@ -1,25 +1,12 @@
 export default {
   FIREBASECONFIG: {
-    apiKey: 'AIzaSyCQ-cBP_eH_5-V_vBR5RyA08EVcjFjM7KY',
-    authDomain: 'maison-chefs.firebaseapp.com',
-    databaseURL: 'https://maison-chefs.firebaseio.com',
-    projectId: 'maison-chefs',
-    storageBucket: 'maison-chefs.appspot.com',
-    messagingSenderId: '291293618946',
-    appId: '1:291293618946:android:1756a42ff21b792e',
+    apiKey: 'AIzaSyD0i8s-nPu7pQmF8JIHOmpvJOpXn_ulP_I',//'AIzaSyAS0AOZ_oCqsDogzgebJPS0ynIbORaFqes',
+    authDomain: 'mentalhealth-ffb87.firebaseapp.com',
+    databaseURL: 'https://mentalhealth-ffb87.firebaseio.com',
+    projectId: 'mentalhealth-ffb87',
+    storageBucket: 'mentalhealth-ffb87.appspot.com',
+    messagingSenderId: '97946538941',
+    appId: '1:97946538941:android:76458603b570d5f8ca38d4',
   //  measurementId: 'G-measurement-id',
   }
 }
-
-
-//id: 0   ip: ivprf.ru      Главный центр
-//id: 1   ip: atcm.ivprf.ru Москва
-//id: 2   ip: sz.ivprf.ru   Санкт-Петербург
-//id: 3   ip: ug.ivprf.ru   Ростов на дону
-//id: 4   ip: cv.ivprf.ru   Самара
-//id: 5   ip: ural.ivprf.ru Екатеринбург
-//id: 6   ip: zs.ivprf.ru   Новосибирск
-//id: 7   ip: dv.ivprf.ru   Хабаровск
-//id: 8   ip: vs.ivprf.ru   Иркутск
-//id: 9   ip: cs.ivprf.ru   Красноярск
-//id: 10  ip: ans.ivprf.ru  Тюмень

@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
 
-export default class Login extends React.PureComponent {
+export default class Register extends React.PureComponent {
 
   constructor(props) {
       super(props);
@@ -22,6 +22,7 @@ export default class Login extends React.PureComponent {
       this.state={
         email: 'vanpipka@gmail.com',
         password: 'knidasew',
+        confirmPassword: 'knidasew',
         errors: "",
         loading: false,
       };
@@ -32,37 +33,41 @@ export default class Login extends React.PureComponent {
 
   }
 
-  onLoginPress(props) {
+  onRegisterPress(props) {
+      if (this.state.password !== this.state.confirmPassword) {
+        alert("Passwords don't match.")
+        return
+      };
 
-    if (!firebase.apps.length) {
-      let FIREBASECONFIG = Const.FIREBASECONFIG;
-      firebase.initializeApp(FIREBASECONFIG);
-    }
+      if (!firebase.apps.length) {
+        let FIREBASECONFIG = Const.FIREBASECONFIG;
+        firebase.initializeApp(FIREBASECONFIG);
+      }
 
-    firebase
+      firebase
           .auth()
-          .signInWithEmailAndPassword(this.state.email, this.state.password)
+          .createUserWithEmailAndPassword(this.state.email, this.state.password)
           .then((response) => {
               const uid = response.user.uid
+              const data = {
+                  id: uid,
+                  email: this.state.email,
+              };
               const usersRef = firebase.firestore().collection('users')
               usersRef
                   .doc(uid)
-                  .get()
-                  .then(firestoreDocument => {
-                      if (!firestoreDocument.exists) {
-                          alert("User does not exist anymore.")
-                          return;
-                      }
-                      const user = firestoreDocument.data()
-                      this.props.navigation.navigate('Main', {user})
+                  .set(data)
+                  .then(() => {
+                      console.log(data);
+                      this.props.navigation.navigate('Main', {user: data})
                   })
-                  .catch(error => {
+                  .catch((error) => {
                       alert(error)
                   });
           })
-          .catch(error => {
+          .catch((error) => {
               alert(error)
-          })
+      });
 
   }
 
@@ -85,22 +90,30 @@ export default class Login extends React.PureComponent {
             <Input
                 placeholder="*********"
                 secureTextEntry={true}
-                label="Код подтверждения"
+                label="Пароль"
                 value={this.state.password}
                 onChangeText={value => this.setState({ password: value })}
             />
 
+            <Input
+                placeholder="*********"
+                secureTextEntry={true}
+                label="Подтверждение пароля"
+                value={this.state.confirmPassword}
+                onChangeText={value => this.setState({ confirmPassword: value })}
+            />
+
             <Button
-              title="Войти"
+              title="Зарегистрироваться"
               buttonStyle={{backgroundColor: Colors.colors.mainGreen}}
-              onPress={() => this.onLoginPress()}
+              onPress={() => this.onRegisterPress()}
             />
 
             <TouchableOpacity
-              style={{flexDirection: 'row', marginTop: 16, justifyContent: 'center'}}
-              onPress = {()=>{this.props.navigation.navigate('Register')}}>
-              <Text style={{color: 'grey'}}>Еще не зарегистрированы?</Text>
-              <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Зарегистрироваться</Text>
+              style={{flexDirection: 'row', marginTop: 16, alignItems: 'center', justifyContent: 'center'}}
+                onPress = {()=>{this.props.navigation.navigate('Login')}}>
+              <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
+              <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Войти</Text>
             </TouchableOpacity>
 
           </KeyboardAwareScrollView>
