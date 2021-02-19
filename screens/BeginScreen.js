@@ -38,8 +38,9 @@ export default class Begin extends React.PureComponent {
             .get()
             .then((document) => {
               const userData = document.data()
-              console.log('----------------------------------------->>>>');
+              console.log('checkLogin----------------------------------------->>>>');
               console.log(userData);
+              console.log('checkLogin----------------------------------------->>>>');
               this.setState({loading: false})
               if (userData != undefined){
                 this.props.navigation.navigate('Main')

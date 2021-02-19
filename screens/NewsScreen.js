@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Platform, Alert, ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native';
+import { Platform, Alert, ScrollView, ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
-import { Card, ListItem, Button, Avatar, Icon } from 'react-native-elements'
+import { Card, ListItem, Button, Avatar, Icon } from 'react-native-elements';
+import { _setTagsInfoFromAsyncStorage } from '../components/WebAPI';
 import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
@@ -33,8 +34,7 @@ export default class News extends React.PureComponent {
       super(props);
       const { navigation } = this.props;
 
-      console.log('HOME');
-      console.log(this.props);
+      console.log('NEWS SCREEN CONSTRUCTOR');
 
       this.state={
           loading: true,
@@ -52,8 +52,25 @@ export default class News extends React.PureComponent {
 
   componentDidMount(){
     this._setNavigationParams();
+    //this._loadTagsInfo();
     this._loadDataAsync();
   }
+
+  _loadTagsInfo = async () => {
+    console.log('before _setTagsInfoFromAsyncStorage');
+    let res = await _getTagsInfoFromAsyncStorage();
+    try {
+      let tagsData = JSON.parse(res);
+      console.log(tagsData);
+    } catch (e) {
+
+    } finally {
+
+    }
+
+  }
+
+
 
   _loadDataAsync = async () => {
 
@@ -78,19 +95,28 @@ export default class News extends React.PureComponent {
   _LoadDataAsync_1 = async () => {
     let database  = firebase.firestore();
     let iter      = 0;
-    const snapshot = await database.collection('news').get();
+    const snapshot = await database.collection('news').orderBy('date').limit(10).get();
     console.log('_LoadDataAsync_1');
     await setTimeout(()=>{
 
         let dataArray = [];
         snapshot.forEach((doc) => {
             let data = doc.data();
-            dataArray.push({date:   data.date,
+            let tags = [];
+
+            for (var i = 0; i < data.tags.length; i++) {
+                tags.push(data.tags[i].id);
+            };
+            dataArray.push({
+                            id:     doc.id,
+                            date:   data.date,
                             img:    data.img,
                             text:   data.text,
                             title:  data.title,
                             type:   data.type,
+                            tags:   tags,
                           })
+
         });
 
         this.setState({data: dataArray, loading: false})
@@ -98,8 +124,6 @@ export default class News extends React.PureComponent {
     }, 1000);
 
   }
-
-  _keyExtractor = (item, index) => item.id;
 
   _onPressItem = (props) => {
 
@@ -131,7 +155,7 @@ export default class News extends React.PureComponent {
             <FlatList
               data={this.state.data}
               extraData={this.state}
-              keyExtractor={this._keyExtractor}
+              keyExtractor={(item, index) => {return item.id;}}
               renderItem={this._renderItem}
               refreshControl={
                 <RefreshControl
@@ -154,6 +178,41 @@ class MyListItem extends React.PureComponent {
 
   render() {
 
+    let TextComponent = null;
+    let text  = this.props.data.text;
+    let textJSON  = {};
+
+    //try {
+        textJSON  = JSON.parse(text);
+        TextArray = [];
+        for (var i = 0; i < textJSON.data.length; i++) {
+
+          let text = textJSON.data[i].text;
+
+          console.log(i);
+          if (i == 1) {
+            text = text + "...";
+            TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
+            break;
+          }else{
+            TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
+          }
+
+        };
+
+        TextComponent = <ScrollView>
+                          {TextArray}
+                        </ScrollView>
+
+    //} catch (e) {
+
+    //    if (text.length > 150) {
+    //      text = text.substr(0, 147)+"..."
+    //    }
+
+    //    TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
+  //  };
+
     return (
       <TouchableOpacity onPress={this._onPress}>
           <Card containerStyle={{borderRadius: 8}}>
@@ -168,10 +227,10 @@ class MyListItem extends React.PureComponent {
             </View>
             <View style={{marginTop: 8}}>
               <Text style={{fontWeight:'700'}}>{this.props.data.title}</Text>
-              <Text style={{marginTop: 8, fontSize: 12, color: 'grey'}}>{this.props.data.text}</Text>
+              {TextComponent}
             </View>
             <View style={{marginTop: 8, marginBottom: 6}}>
-              <Text style={{color: '#5A00C4', fontSize: 12, }}>tag_1, tag_2</Text>
+              <Text style={{color: '#5A00C4', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
             </View>
 
             <Card.Divider/>
