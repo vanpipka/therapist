@@ -54,7 +54,7 @@ export default class Login extends React.PureComponent {
                           return;
                       }
                       const user = firestoreDocument.data()
-                      this.props.navigation.navigate('Main', {user})
+                      this.props.navigation.navigate('Main', {user: user})
                   })
                   .catch(error => {
                       alert(error)

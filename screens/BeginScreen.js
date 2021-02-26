@@ -30,7 +30,7 @@ export default class Begin extends React.PureComponent {
       firebase.initializeApp(FIREBASECONFIG);
     }
 
-    const usersRef = firebase.firestore().collection('users');
+  /*  const usersRef = firebase.firestore().collection('users');
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
           usersRef
@@ -43,7 +43,7 @@ export default class Begin extends React.PureComponent {
               console.log('checkLogin----------------------------------------->>>>');
               this.setState({loading: false})
               if (userData != undefined){
-                this.props.navigation.navigate('Main')
+                this.props.navigation.navigate('Main', {user: userData})
               }
             })
             .catch((error) => {
@@ -52,9 +52,9 @@ export default class Begin extends React.PureComponent {
         } else {
           this.setState({loading: false})
         }
-      });
+      });*/
+      this.setState({loading: false})
   }
-
 
   render() {
     if (this.state.loading == true) {

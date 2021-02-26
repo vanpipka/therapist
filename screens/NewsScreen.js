@@ -56,7 +56,7 @@ export default class News extends React.PureComponent {
     this._loadDataAsync();
   }
 
-  _loadTagsInfo = async () => {
+  /*_loadTagsInfo = async () => {
     console.log('before _setTagsInfoFromAsyncStorage');
     let res = await _getTagsInfoFromAsyncStorage();
     try {
@@ -68,9 +68,7 @@ export default class News extends React.PureComponent {
 
     }
 
-  }
-
-
+  }*/
 
   _loadDataAsync = async () => {
 
@@ -182,7 +180,7 @@ class MyListItem extends React.PureComponent {
     let text  = this.props.data.text;
     let textJSON  = {};
 
-    //try {
+    try {
         textJSON  = JSON.parse(text);
         TextArray = [];
         for (var i = 0; i < textJSON.data.length; i++) {
@@ -204,14 +202,14 @@ class MyListItem extends React.PureComponent {
                           {TextArray}
                         </ScrollView>
 
-    //} catch (e) {
+    } catch (e) {
 
-    //    if (text.length > 150) {
-    //      text = text.substr(0, 147)+"..."
-    //    }
+        if (text.length > 150) {
+          text = text.substr(0, 147)+"..."
+        }
 
-    //    TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
-  //  };
+        TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
+    };
 
     return (
       <TouchableOpacity onPress={this._onPress}>

@@ -2,7 +2,7 @@ export default {
   FIREBASECONFIG: {
     apiKey: 'AIzaSyD0i8s-nPu7pQmF8JIHOmpvJOpXn_ulP_I',//'AIzaSyAS0AOZ_oCqsDogzgebJPS0ynIbORaFqes',
     authDomain: 'mentalhealth-ffb87.firebaseapp.com',
-    databaseURL: 'https://mentalhealth-ffb87.firebaseio.com',
+    databaseURL: 'https://mentalhealth-ffb87-default-rtdb.europe-west1.firebasedatabase.app/',//https://mentalhealth-ffb87.firebaseio.com',
     projectId: 'mentalhealth-ffb87',
     storageBucket: 'mentalhealth-ffb87.appspot.com',
     messagingSenderId: '97946538941',
