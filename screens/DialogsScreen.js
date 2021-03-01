@@ -93,13 +93,12 @@ export default class Dialogs extends React.Component {
           {
             this.state.dialogs.map((l, i) => (
               <ListItem key={l.id} bottomDivider
-                onPress = {() => this.props.navigation.navigate('Chat', {user: this.state.user, id: l.id})}>
+                onPress = {() => this.props.navigation.navigate('Chat', {user: this.state.userid, id: l.id})}>
                 <Avatar rounded source={{uri: l.user.avatar}} />
                 <ListItem.Content>
                   <ListItem.Title>{l.user.name}</ListItem.Title>
                   <ListItem.Subtitle>{l.text}</ListItem.Subtitle>
                 </ListItem.Content>
-
               </ListItem>
             ))
           }

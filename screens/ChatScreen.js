@@ -8,6 +8,9 @@ export default class Chat extends React.Component {
   constructor(props) {
     super(props);
     this._LoadDataAsync_1 = this._LoadDataAsync_1.bind(this);
+
+    console.log(props);
+
     this.state = {
       userid: props.route.params.id,
       messages: [],
@@ -17,7 +20,7 @@ export default class Chat extends React.Component {
   };
 
   componentDidMount() {
-    this._loadDataAsync();
+    //this._loadDataAsync();
   /*  firebaseSvc.refOn(message =>
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, message),
