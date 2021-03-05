@@ -43,3 +43,62 @@ _getTagsInfo = async (props) => {
     return tagsString;
 
 }
+
+export function ConvertDateToString(date){
+
+  let getFullYear = date.getFullYear(); //2019
+  let getMonth = "00"+date.getMonth(); // 10
+  let getDate = "00"+date.getDate(); // 11
+  let getHours = "00"+date.getHours(); // 10
+  let getMinutes = "00"+date.getMinutes(); // 0
+  let getSeconds = "00"+date.getSeconds(); // 0
+
+  let convertdate = ""+date.getFullYear()+
+                    getMonth.slice(-2)+
+                    getDate.slice(-2)+
+                    getHours.slice(-2)+
+                    getMinutes.slice(-2)+
+                    getSeconds.slice(-2);
+
+  return convertdate;
+
+}
+
+export function ConvertStringToDate(stringDate){
+
+  console.log('stringDate');
+  console.log(stringDate);
+
+  if (stringDate == undefined) {
+      return new Date()
+  }
+  let date = ""+stringDate;
+  let convertdate = new Date(date.substr(0, 4),
+                              date.substr(4, 2),
+                              date.substr(6, 2),
+                              date.substr(8, 2),
+                              date.substr(10, 2),
+                              date.substr(12, 2));
+
+  return convertdate;
+
+}
+
+export function GetDateView(date){
+
+  let getFullYear = date.getFullYear(); //2019
+  let getMonth = "00"+date.getMonth(); // 10
+  let getDate = "00"+date.getDate(); // 11
+  let getHours = "00"+date.getHours(); // 10
+  let getMinutes = "00"+date.getMinutes(); // 0
+  let getSeconds = "00"+date.getSeconds(); // 0
+
+  let convertdate = getDate.slice(-2)+'.'+
+                    getMonth.slice(-2)+'.'+
+                    date.getFullYear()+' '+
+                    getHours.slice(-2)+':'+
+                    getMinutes.slice(-2);
+
+  return convertdate;
+
+}

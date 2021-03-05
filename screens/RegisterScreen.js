@@ -52,6 +52,8 @@ export default class Register extends React.PureComponent {
               const data = {
                   id: uid,
                   email: this.state.email,
+                  name: '',
+                  avatar: '',
               };
               const usersRef = firebase.firestore().collection('users')
               usersRef

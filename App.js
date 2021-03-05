@@ -5,7 +5,7 @@ import { Asset } from 'expo-asset';
 import AppLoading from 'expo-app-loading';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { GetTagsInfo } from './components/WebAPI';
+//import { GetTagsInfo } from './components/WebAPI';
 import Begin from './screens/BeginScreen';
 import Login from './screens/LoginScreen';
 import Register from './screens/RegisterScreen';
@@ -72,7 +72,7 @@ export default class App extends React.Component {
       Asset.loadAsync([
         require('./assets/icon.png'),
       ]),
-      GetTagsInfo(),
+      //GetTagsInfo(),
       //Font.loadAsync({
         // This is the font that we are using for our tab bar
       //  ...Icon.Ionicons.font,

@@ -18,6 +18,9 @@ export default function Main({route, navigation}) {
 
   const { user } = route.params;
 
+  console.log("export default function Main ");
+  console.log(user);
+
   return (
       <Tab.Navigator>
         <Tab.Screen

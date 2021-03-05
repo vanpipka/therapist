@@ -3,14 +3,16 @@ import { Text, View, StyleSheet, ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 import Colors from '../constants/Colors';
 import { ListItem, Avatar } from 'react-native-elements'
+import { GetDateView, ConvertStringToDate } from '../components/WebAPI';
 
 export default class Dialogs extends React.Component {
 
   constructor(props) {
     super(props);
     this._LoadDataAsync_1 = this._LoadDataAsync_1.bind(this);
+
     this.state = {
-      userid: props.route.params.id,
+      user: props.route.params,
       dialogs: [],
       loading: true,
     }
@@ -44,40 +46,41 @@ export default class Dialogs extends React.Component {
   _LoadDataAsync_1 = async () => {
 
     let database = firebase.database();
-    console.log('_LoadDataAsync_1');
-    let getAllMessages = database.ref('dialogs').orderByChild("user").equalTo(this.state.userid);
+    console.log('_LoadDataAsync_2');
+    let getAllMessages = database.ref('dialogs').orderByKey().equalTo(this.state.user.id);
     getAllMessages.on('value', (snapshot) => {
 
       let dialogsArray = [];
       const data = snapshot.val();
       for (var key in data) {
-        dialogsArray.push(
-          { id: key,
-            text: data[key].lastmessage.text,
-            createdAt: data[key].lastmessage.createdAt,
-            user: {
-              id: data[key].recipient.id,
-              name: data[key].recipient.name,
-              avatar: data[key].recipient.url,
+
+        let dialogs = data[key].dialogs;
+
+        for (var key in dialogs) {
+
+          let createdAt = ConvertStringToDate(dialogs[key].createdAt);
+
+          dialogsArray.push(
+            { id: key,
+              text: dialogs[key].text,
+              createdAt: createdAt,
+              createdAtStr: GetDateView(createdAt),
+              user: {
+                id: dialogs[key].recipient.id,
+                name: dialogs[key].recipient.name,
+                avatar: dialogs[key].recipient.avatar,
+              },
             },
-          },
-        )
+          )
+        }
       }
 
-      console.log(dialogsArray);
+      dialogsArray.sort((a, b) => a.createdAt > b.createdAt ? 1 : -1);
 
       this.setState({dialogs: dialogsArray, loading: false})
 
-      //updateStarCount(postElement, data);
     });
 
-    /*database.ref('messages/'+uuidv4()).set({
-        text: 'test',
-        user: this.state.userid,
-        recipient: 'XEJEfGAMw9f022ydrYjrE5wyueT2',
-        createdAt : new Date(),
-        user: this.state.userid,
-      });*/
   }
 
   render() {
@@ -93,10 +96,17 @@ export default class Dialogs extends React.Component {
           {
             this.state.dialogs.map((l, i) => (
               <ListItem key={l.id} bottomDivider
-                onPress = {() => this.props.navigation.navigate('Chat', {user: this.state.userid, id: l.id})}>
+                onPress = {() => this.props.navigation.navigate('Chat', {user: this.state.user, id: l.id, recipient: l.user})}>
                 <Avatar rounded source={{uri: l.user.avatar}} />
                 <ListItem.Content>
-                  <ListItem.Title>{l.user.name}</ListItem.Title>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <ListItem.Title style={{width: '80%'}}>
+                          {l.user.name}
+                      </ListItem.Title>
+                      <View style={{marginTop: 8, width: '20%'}}>
+                        <Text style={{fontSize: 10}}>{l.createdAtStr}</Text>
+                      </View>
+                  </View>
                   <ListItem.Subtitle>{l.text}</ListItem.Subtitle>
                 </ListItem.Content>
               </ListItem>
