@@ -9,6 +9,7 @@ import Const from '../constants/Const';
 import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
 import { Input } from 'react-native-elements';
+import { GetDateView, ConvertStringToDate } from '../components/WebAPI';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -38,6 +39,8 @@ export default class News extends React.PureComponent {
 
       this.state={
           loading: true,
+          refreshdata: true,
+          data: [],
       };
 
   }
@@ -93,7 +96,7 @@ export default class News extends React.PureComponent {
   _LoadDataAsync_1 = async () => {
     let database  = firebase.firestore();
     let iter      = 0;
-    const snapshot = await database.collection('news').orderBy('date').limit(10).get();
+    const snapshot = await database.collection('news').orderBy('date', 'desc').limit(10).get();
     console.log('_LoadDataAsync_1');
     await setTimeout(()=>{
 
@@ -107,17 +110,25 @@ export default class News extends React.PureComponent {
             };
             dataArray.push({
                             id:     doc.id,
-                            date:   data.date,
+                            date:   GetDateView(ConvertStringToDate(data.date)),
                             img:    data.img,
                             text:   data.text,
                             title:  data.title,
                             type:   data.type,
+                            commentsCount: data.commentsCount,
+                            heartsCount: data.heartsCount,
                             tags:   tags,
-                          })
+                            author: {
+                                id: data.author['id'],
+                                name: data.author['name'],
+                                avatar: data.author['avatar']
+                            }
+                          }
+                        );
 
         });
 
-        this.setState({data: dataArray, loading: false})
+        this.setState({data: dataArray, loading: false, refreshdata: !this.state.refreshdata})
 
     }, 1000);
 
@@ -125,10 +136,29 @@ export default class News extends React.PureComponent {
 
   _onPressItem = (props) => {
 
-      console.log('set item---------------------->');
-      console.log(props);
-      //this.props.navigation.navigate("Dish", {});
-      //this.setState({dish_card_visible: true, current_item: props})
+      this.props.navigation.navigate("Article", props.data);
+
+  };
+
+  _onPressLike = (props) => {
+
+      let array = this.state.data;
+
+      for (var i = 0; i < array.length; i++) {
+
+        if (array[i].id == props.data.id) {
+          console.log(array[0].id);
+          if (array[i].heartsCount==1) {
+            array[i].heartsCount = 0
+          }else{
+            array[i].heartsCount = 1
+          }
+          console.log(array[i].heartsCount);
+        }
+      }
+
+      this.setState({data: array, refreshdata: !this.state.refreshdata})
+
       //Overlay
   };
 
@@ -136,6 +166,7 @@ export default class News extends React.PureComponent {
       <MyListItem
         key = {item.id}
         onPressItem={this._onPressItem}
+        onPressLike={this._onPressLike}
         data={item}
       />
   );
@@ -149,10 +180,10 @@ export default class News extends React.PureComponent {
           )
       }else{
         return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 8}}>
             <FlatList
               data={this.state.data}
-              extraData={this.state}
+              extraData={this.state.refreshdata}
               keyExtractor={(item, index) => {return item.id;}}
               renderItem={this._renderItem}
               refreshControl={
@@ -174,7 +205,13 @@ class MyListItem extends React.PureComponent {
     this.props.onPressItem(this.props);
   };
 
+  _onPressLike = () => {
+    this.props.onPressLike(this.props);
+  };
+
   render() {
+
+    console.log('MyListItem render');
 
     let TextComponent = null;
     let text  = this.props.data.text;
@@ -213,14 +250,14 @@ class MyListItem extends React.PureComponent {
 
     return (
       <TouchableOpacity onPress={this._onPress}>
-          <Card containerStyle={{borderRadius: 8}}>
+          <Card containerStyle={{borderRadius: 8, margin: 8}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Avatar size="small" rounded source = {{uri:this.props.data.img}}/>
-                <Text style={{marginLeft: 8}}>Michael</Text>
+                <Avatar size="small" rounded source = {{uri:this.props.data.author.avatar}}/>
+                <Text style={{marginLeft: 8}}>{this.props.data.author.name}</Text>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{marginLeft: 8}}>11:22</Text>
+                <Text style={{marginLeft: 8, fontSize: 8}}>{this.props.data.date}</Text>
               </View>
             </View>
             <View style={{marginTop: 8}}>
@@ -235,12 +272,15 @@ class MyListItem extends React.PureComponent {
 
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
               <View style={{alignItems: 'flex-start'}}>
-                <Icon
-                  name='chat-bubble'
-                  type='material-icons'
-                  color='grey'
-                  size={16}
-                />
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon
+                    name='chat-bubble'
+                    type='material-icons'
+                    size={16}
+                    color={this.props.data.commentsCount == 0 ? 'grey' : '#009789' }
+                  />
+                  {this.props.data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{this.props.data.commentsCount}</Text> }
+                </View>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
                 <Icon
@@ -249,13 +289,16 @@ class MyListItem extends React.PureComponent {
                   color='grey'
                   size={16}
                 />
-                <Icon
-                  name='favorite'
-                  type='material-icons'
-                  color='grey'
-                  containerStyle = {{marginLeft: 8}}
-                  size={16}
-                />
+                <TouchableOpacity onPress = {this._onPressLike}>
+                  <Icon
+                    name='favorite'
+                    type='material-icons'
+                    color='grey'
+                    containerStyle = {{marginLeft: 8}}
+                    size={16}
+                    color={this.props.data.heartsCount == 0 ? 'grey' : 'red' }
+                  />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -269,7 +312,7 @@ class MyListItem extends React.PureComponent {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 0,
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',

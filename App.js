@@ -11,6 +11,8 @@ import Login from './screens/LoginScreen';
 import Register from './screens/RegisterScreen';
 import Main from './screens/MainScreen';
 import Chat from './screens/ChatScreen';
+import Article from './screens/ArticleScreen';
+
 
 const Stack = createStackNavigator();
 
@@ -58,6 +60,11 @@ export default class App extends React.Component {
                 name="Chat"
                 component={Chat}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Article"
+                component={Article}
+                options={{}}
               />
             </Stack.Navigator>
           </NavigationContainer>

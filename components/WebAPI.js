@@ -86,6 +86,13 @@ export function ConvertStringToDate(stringDate){
 
 export function GetDateView(date){
 
+  let today = new Date();
+  let d = new Date(date);
+  let convertdate = "";
+
+  today.setHours(0, 0, 0, 0);
+  d.setHours(0, 0, 0, 0);
+
   let getFullYear = date.getFullYear(); //2019
   let getMonth = "00"+date.getMonth(); // 10
   let getDate = "00"+date.getDate(); // 11
@@ -93,12 +100,15 @@ export function GetDateView(date){
   let getMinutes = "00"+date.getMinutes(); // 0
   let getSeconds = "00"+date.getSeconds(); // 0
 
-  let convertdate = getDate.slice(-2)+'.'+
-                    getMonth.slice(-2)+'.'+
-                    date.getFullYear()+' '+
-                    getHours.slice(-2)+':'+
-                    getMinutes.slice(-2);
-
+  if(d >= today){
+    convertdate = getHours.slice(-2)+':'+
+                      getMinutes.slice(-2);
+  }else{
+    convertdate = getDate.slice(-2)+'.'+
+                      getMonth.slice(-2)+'.'+
+                      date.getFullYear();
+  }
+  
   return convertdate;
 
 }
