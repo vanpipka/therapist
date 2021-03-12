@@ -92,8 +92,6 @@ export default class Article extends React.PureComponent {
 
     this.setState({comments: dataArray})
 
-    console.log(dataArray);
-
   }
 
   _sendMessageAsync = async (props) => {
@@ -105,7 +103,7 @@ export default class Article extends React.PureComponent {
 
     let database  = firebase.firestore();
     let data      = {
-            author: this.state.author,
+            author: this.state.user,
             date: ConvertDateToString(new Date()),
             link: this.state.id,
             text: this.state.message,
@@ -195,7 +193,7 @@ export default class Article extends React.PureComponent {
                     <Text style={{margin: 8, color: '#009789', fontSize: 12, fontWeight: '700'}}>Комментариев еще нет</Text> :
                     <Text style={{margin: 8, color: '#009789', fontSize: 12, fontWeight: '700'}}>{this.state.commentsCount} комментариев</Text> }
                 {this.state.comments.map((l, i) => (
-                          <ListItem key={l.id} bottomDivider
+                          <ListItem key={i} bottomDivider
                             onPress = {() => console.log(l)}>
                             <Avatar rounded source={{uri: l.author.avatar}} />
                             <ListItem.Content>

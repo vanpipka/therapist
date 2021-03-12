@@ -38,6 +38,7 @@ export default class News extends React.PureComponent {
       console.log('NEWS SCREEN CONSTRUCTOR');
 
       this.state={
+          user: props.route.params,
           loading: true,
           refreshdata: true,
           data: [],
@@ -98,10 +99,8 @@ export default class News extends React.PureComponent {
     let iter      = 0;
     const snapshot = await database.collection('news').orderBy('date', 'desc').limit(10).get();
     console.log('_LoadDataAsync_1');
-    await setTimeout(()=>{
-
-        let dataArray = [];
-        snapshot.forEach((doc) => {
+    let dataArray = [];
+    snapshot.forEach((doc) => {
             let data = doc.data();
             let tags = [];
 
@@ -126,16 +125,15 @@ export default class News extends React.PureComponent {
                           }
                         );
 
-        });
+    });
 
-        this.setState({data: dataArray, loading: false, refreshdata: !this.state.refreshdata})
-
-    }, 1000);
+    this.setState({data: dataArray, loading: false, refreshdata: !this.state.refreshdata})
 
   }
 
   _onPressItem = (props) => {
 
+      props.data['user'] = this.state.user;
       this.props.navigation.navigate("Article", props.data);
 
   };

@@ -91,7 +91,6 @@ export function GetDateView(date){
   let convertdate = "";
 
   today.setHours(0, 0, 0, 0);
-  d.setHours(0, 0, 0, 0);
 
   let getFullYear = date.getFullYear(); //2019
   let getMonth = "00"+date.getMonth(); // 10
@@ -100,7 +99,12 @@ export function GetDateView(date){
   let getMinutes = "00"+date.getMinutes(); // 0
   let getSeconds = "00"+date.getSeconds(); // 0
 
-  if(d >= today){
+  console.log("//------------------");
+  console.log(today);
+  console.log(d);
+  console.log("//------------------");
+
+  if(today <= d){
     convertdate = getHours.slice(-2)+':'+
                       getMinutes.slice(-2);
   }else{
@@ -108,7 +112,7 @@ export function GetDateView(date){
                       getMonth.slice(-2)+'.'+
                       date.getFullYear();
   }
-  
+
   return convertdate;
 
 }
