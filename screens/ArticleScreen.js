@@ -148,10 +148,12 @@ export default class Article extends React.PureComponent {
             <ScrollView>
               <Card containerStyle={{borderRadius: 8, margin: 8, flex: 1}}>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Avatar size="small" rounded source = {{uri:this.state.author.avatar}}/>
-                    <Text style={{marginLeft: 8}}>{this.state.author.name}</Text>
-                  </View>
+                  <TouchableOpacity onPress = {() => this.props.navigation.navigate("User", this.state.author)}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Avatar size="small" rounded source = {{uri:this.state.author.avatar}}/>
+                      <Text style={{marginLeft: 8}}>{this.state.author.name}</Text>
+                    </View>
+                  </TouchableOpacity>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Text style={{marginLeft: 8, fontSize: 8}}>{this.state.date}</Text>
                   </View>
@@ -194,7 +196,7 @@ export default class Article extends React.PureComponent {
                     <Text style={{margin: 8, color: '#009789', fontSize: 12, fontWeight: '700'}}>{this.state.commentsCount} комментариев</Text> }
                 {this.state.comments.map((l, i) => (
                           <ListItem key={i} bottomDivider
-                            onPress = {() => console.log(l)}>
+                            onPress = {() => this.props.navigation.navigate("User", l.author)}>
                             <Avatar rounded source={{uri: l.author.avatar}} />
                             <ListItem.Content>
                               <View style={{flexDirection: 'row', alignItems: 'center'}}>

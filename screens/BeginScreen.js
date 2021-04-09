@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Image} from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
-import { Card, ListItem, Button, Icon } from 'react-native-elements'
+import { Card, ListItem, Button, Icon, Text } from 'react-native-elements'
 import Swiper from 'react-native-swiper';
 import * as firebase from 'firebase';
 import Colors from '../constants/Colors';
@@ -74,7 +74,12 @@ export default class Begin extends React.PureComponent {
           <Swiper style={styles.wrapper}
             activeDotColor={Colors.colors.mainGreen}>
             <View style={styles.slide1}>
-              <Text style={styles.text}>Hello Swiper</Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text h4 style={{color: '#666666'}}>Инструменты для раскрытия</Text>
+                <Text h4 style={{color: '#666666'}}>Вашего потенциала </Text>
+                <Image source={require('../assets/img/step1.png')} style={styles.image}/>
+
+              </View>
             </View>
             <View style={styles.slide2}>
               <Text style={styles.text}>Beautiful</Text>
@@ -107,7 +112,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 40,
-    backgroundColor: 'white',
+    backgroundColor: '#f9fafe',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -133,5 +138,12 @@ const styles = StyleSheet.create({
     color: Colors.colors.mainGreen,
     fontSize: 30,
     fontWeight: 'bold'
-  }
+  },
+  image: {
+    resizeMode: "stretch",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 300,
+    height: 270,
+  },
 });

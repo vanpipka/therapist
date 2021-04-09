@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
 import { Input, Icon } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -32,6 +33,21 @@ export default class Login extends React.PureComponent {
 
   }
 
+  _saveUser = async (user) => {
+    try {
+
+      console.log(user);
+      await AsyncStorage.setItem('user_id', user.id);
+      await AsyncStorage.setItem('user_name', user.name);
+      await AsyncStorage.setItem('user_avatar', user.avatar);
+
+      this.props.navigation.navigate('Main', {user: user});
+
+    } catch (error) {
+
+    }
+  };
+
   onLoginPress(props) {
 
     if (!firebase.apps.length) {
@@ -53,8 +69,8 @@ export default class Login extends React.PureComponent {
                           alert("User does not exist anymore.")
                           return;
                       }
-                      const user = firestoreDocument.data()
-                      this.props.navigation.navigate('Main', {user: user})
+                      const user = firestoreDocument.data();
+                      this._saveUser(user);
                   })
                   .catch(error => {
                       alert(error)
@@ -69,12 +85,19 @@ export default class Login extends React.PureComponent {
   render() {
       return (
         <View style={styles.container}>
-          <KeyboardAwareScrollView
-              style={{width: '100%'}}
-              keyboardShouldPersistTaps="always">
+          <SafeAreaInsetsContext.Consumer>
+            {insets => <View style={{ paddingTop: insets.top }} />}
+          </SafeAreaInsetsContext.Consumer>
+
+          <Card containerStyle={{borderRadius:25, width: '100%', backgroundColor: 'white'}}>
+
+            <Card.Title>
               <Icon
                 name='people'
                 color={Colors.colors.mainGreen} />
+            </Card.Title>
+            <Card.Divider/>
+
             <Input
                placeholder="8 (999) 900 90 90"
                label="Номер телефона"
@@ -97,13 +120,13 @@ export default class Login extends React.PureComponent {
             />
 
             <TouchableOpacity
-              style={{flexDirection: 'row', marginTop: 16, justifyContent: 'center'}}
+              style={{marginTop: 16, justifyContent: 'center', alignItems: 'center'}}
               onPress = {()=>{this.props.navigation.navigate('Register')}}>
               <Text style={{color: 'grey'}}>Еще не зарегистрированы?</Text>
               <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Зарегистрироваться</Text>
             </TouchableOpacity>
 
-          </KeyboardAwareScrollView>
+        </Card>
 
       </View>
     );
@@ -115,7 +138,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#f9fafe',
     alignItems: 'center',
     justifyContent: 'center',
   },

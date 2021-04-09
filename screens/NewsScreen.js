@@ -263,7 +263,7 @@ class MyListItem extends React.PureComponent {
               {TextComponent}
             </View>
             <View style={{marginTop: 8, marginBottom: 6}}>
-              <Text style={{color: '#5A00C4', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
+              <Text style={{color: '#8154b9', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
             </View>
 
             <Card.Divider/>

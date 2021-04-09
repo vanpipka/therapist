@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
 import { Input, Icon } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -76,49 +77,58 @@ export default class Register extends React.PureComponent {
   render() {
       return (
         <View style={styles.container}>
-          <KeyboardAwareScrollView
-              style={{width: '100%'}}
-              keyboardShouldPersistTaps="always">
-              <Icon
-                name='people'
-                color={Colors.colors.mainGreen} />
-            <Input
-               placeholder="8 (999) 900 90 90"
-               label="Номер телефона"
-               value={this.state.email}
-               onChangeText={value => this.setState({ email: value })}
-            />
+          <SafeAreaInsetsContext.Consumer>
+            {insets => <View style={{ paddingTop: insets.top }} />}
+          </SafeAreaInsetsContext.Consumer>
 
-            <Input
-                placeholder="*********"
-                secureTextEntry={true}
-                label="Пароль"
-                value={this.state.password}
-                onChangeText={value => this.setState({ password: value })}
-            />
+            <Card containerStyle={{borderRadius:25, width: '100%', backgroundColor: 'white'}}>
 
-            <Input
-                placeholder="*********"
-                secureTextEntry={true}
-                label="Подтверждение пароля"
-                value={this.state.confirmPassword}
-                onChangeText={value => this.setState({ confirmPassword: value })}
-            />
+              <Card.Title>
+                <Icon
+                  name='people'
+                  color={Colors.colors.mainGreen} />
+              </Card.Title>
 
-            <Button
-              title="Зарегистрироваться"
-              buttonStyle={{backgroundColor: Colors.colors.mainGreen}}
-              onPress={() => this.onRegisterPress()}
-            />
+              <Card.Divider/>
 
-            <TouchableOpacity
-              style={{flexDirection: 'row', marginTop: 16, alignItems: 'center', justifyContent: 'center'}}
-                onPress = {()=>{this.props.navigation.navigate('Login')}}>
-              <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
-              <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Войти</Text>
-            </TouchableOpacity>
+                <Input
+                   placeholder="8 (999) 900 90 90"
+                   label="Номер телефона"
+                   value={this.state.email}
+                   onChangeText={value => this.setState({ email: value })}
+                />
 
-          </KeyboardAwareScrollView>
+                <Input
+                    placeholder="*********"
+                    secureTextEntry={true}
+                    label="Пароль"
+                    value={this.state.password}
+                    onChangeText={value => this.setState({ password: value })}
+                />
+
+                <Input
+                    placeholder="*********"
+                    secureTextEntry={true}
+                    label="Подтверждение пароля"
+                    value={this.state.confirmPassword}
+                    onChangeText={value => this.setState({ confirmPassword: value })}
+                />
+
+                <Button
+                  title="Зарегистрироваться"
+                  buttonStyle={{backgroundColor: Colors.colors.mainGreen}}
+                  onPress={() => this.onRegisterPress()}
+                />
+
+                <TouchableOpacity
+                  style={{marginTop: 16, alignItems: 'center', justifyContent: 'center'}}
+                    onPress = {()=>{this.props.navigation.navigate('Login')}}>
+                  <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
+                  <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Войти</Text>
+                </TouchableOpacity>
+
+
+            </Card>
 
       </View>
     );
@@ -130,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#f9fafe',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,3 +1,5 @@
+
+import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { Platform, StatusBar, StyleSheet, View, Text } from 'react-native';
 import * as Font from 'expo-font';
@@ -11,8 +13,10 @@ import Login from './screens/LoginScreen';
 import Register from './screens/RegisterScreen';
 import Main from './screens/MainScreen';
 import Chat from './screens/ChatScreen';
+import User from './screens/UserScreen';
+import VideoCall from './screens/VideoCallScreen';
 import Article from './screens/ArticleScreen';
-
+//import VideoCall from './screens/VideoCallScreen';
 
 const Stack = createStackNavigator();
 
@@ -59,11 +63,21 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="Chat"
                 component={Chat}
-                options={{ headerShown: false }}
+                options={{}}
               />
               <Stack.Screen
                 name="Article"
                 component={Article}
+                options={{}}
+              />
+              <Stack.Screen
+                name="User"
+                component={User}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="VideoCall"
+                component={VideoCall}
                 options={{}}
               />
             </Stack.Navigator>
@@ -100,6 +114,8 @@ export default class App extends React.Component {
     this.setState({ isLoadingComplete: true });
   };
 }
+
+registerRootComponent(App);
 
 const styles = StyleSheet.create({
   container: {

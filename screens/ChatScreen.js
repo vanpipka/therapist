@@ -1,8 +1,11 @@
 import React from 'react';
 import { GiftedChat } from 'react-native-gifted-chat';
+import { Platform, AsyncStorage } from 'react-native';
 import * as firebase from 'firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { ConvertDateToString, ConvertStringToDate } from '../components/WebAPI';
+
+
 
 export default class Chat extends React.Component {
 
@@ -10,11 +13,13 @@ export default class Chat extends React.Component {
     super(props);
     this._LoadDataAsync_1 = this._LoadDataAsync_1.bind(this);
 
-    this.state = {
+    console.log(props);
 
+    this.state = {
       user: props.route.params.user,
       recipient: props.route.params.recipient,
       dialog: props.route.params.id,
+      error: false,
       messages: [],
     }
 
@@ -37,6 +42,9 @@ export default class Chat extends React.Component {
 
   _loadDataAsync = async () => {
 
+    let user_id = await AsyncStorage.getItem("user_id");
+    console.log('chat _loadDataAsync', user_id);
+
     if (!firebase.apps.length) {
       let FIREBASECONFIG = Const.FIREBASECONFIG;
       firebase.initializeApp(FIREBASECONFIG);
@@ -56,9 +64,41 @@ export default class Chat extends React.Component {
     }
 
   _LoadDataAsync_1 = async () => {
-    //console.log('_LoadDataAsync_1');
-    let database = firebase.database();
-    let getAllMessages = database.ref('messages').orderByChild("dialog").equalTo(this.state.dialog);
+
+    console.log("---------------1");
+    console.log(this.state.user);
+
+    if (this.state.dialog == null) {
+
+      let ref = 'dialogs/'+this.state.user.id+'/dialogs';
+
+      let dialogQuery = firebase.database().ref(ref).orderByChild("recipient/id").equalTo(this.state.recipient.id);
+
+      dialogQuery.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data == null) {
+          console.log('new dialog');
+          let newDialogID = ''+uuidv4();
+          this.setState({dialog: newDialogID}, () => {this._LoadDataAsync_2()})
+        }else{
+          console.log('dialog');
+          let dialogID = null;
+          for (var key in data) {
+            dialogID = key
+          };
+          this.setState({dialog: dialogID}, () => {this._LoadDataAsync_2()})
+        };
+        firebase.database().ref(ref).off();
+      });
+    }else{
+      this._LoadDataAsync_2();
+    }
+
+  }
+
+  _LoadDataAsync_2 = async () => {
+
+    let getAllMessages = firebase.database().ref('messages').orderByChild("dialog").equalTo(this.state.dialog);
 
     getAllMessages.on('value', (snapshot) => {
 
@@ -107,8 +147,9 @@ export default class Chat extends React.Component {
   onLoginPress(props) {
 
   }
+
   onSend(props){
-      console.log('onSend');
+      console.log('onSend dialog_id'+this.state.dialog);
       console.log(props);
 
       let messageData = {
@@ -119,29 +160,28 @@ export default class Chat extends React.Component {
         dialog: this.state.dialog,
       };
 
+      console.log(messageData);
+
       firebase.database().ref('messages/'+props[0]._id).set(messageData, (error) => {
         if (error) {
           // The write failed...
         } else {
 
-          /*let updates = {};
-          updates['dialogs/'+messageData.user.id+'/user'] = messageData.user.id;
-          updates['dialogs/'+messageData.recipient.id+'/user'] = messageData.recipient.id;
-          firebase.database().ref().update(updates);*/
-
-
           //ОБновим данные в диалогах
           firebase.database().ref('dialogs/'+messageData.user.id+'/dialogs/'+this.state.dialog).set(
                           { text: messageData.text,
                             createdAt: messageData.createdAt,
-                            recipient: messageData.recipient}
+                            recipient: messageData.recipient
+                          }
                         );
-
-          firebase.database().ref('dialogs/'+messageData.recipient.id+'/dialogs/'+this.state.dialog).set(
+          if (messageData.user.id != messageData.recipient.id) {
+            firebase.database().ref('dialogs/'+messageData.recipient.id+'/dialogs/'+this.state.dialog).set(
                           { text: messageData.text,
                             createdAt: messageData.createdAt,
-                            recipient: messageData.user}
-                          );
+                            recipient: messageData.user
+                          }
+                        );
+          };
         }
       });
     /*  Array [
@@ -158,6 +198,7 @@ export default class Chat extends React.Component {
   }
 
   render() {
+    console.log(this.state.dialog);
     return (
       <GiftedChat
         messages={this.state.messages}
