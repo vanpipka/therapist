@@ -100,6 +100,25 @@ export default class News extends React.PureComponent {
     const snapshot = await database.collection('news').orderBy('date', 'desc').limit(10).get();
     console.log('_LoadDataAsync_1');
     let dataArray = [];
+
+    dataArray.push({
+                    id:     'get_new_item',
+                    date:   '',
+                    img:    '../assets/img/add_item.png',
+                    text:   'new item',
+                    title:  'new item',
+                    type:   2,
+                    commentsCount: 0,
+                    heartsCount: 0,
+                    tags:   [],
+                    author: {
+                        id: '',
+                        name: '',
+                        avatar: ''
+                    }
+                  }
+                );
+
     snapshot.forEach((doc) => {
             let data = doc.data();
             let tags = [];
@@ -134,8 +153,12 @@ export default class News extends React.PureComponent {
   _onPressItem = (props) => {
 
       props.data['user'] = this.state.user;
-      this.props.navigation.navigate("Article", props.data);
 
+      if (props.data['id'] == "get_new_item" ) {
+        this.props.navigation.navigate("AddArticle", props.data);
+      }else{
+        this.props.navigation.navigate("Article", props.data);
+      }
   };
 
   _onPressLike = (props) => {
@@ -246,63 +269,81 @@ class MyListItem extends React.PureComponent {
         TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
     };
 
-    return (
-      <TouchableOpacity onPress={this._onPress}>
-          <Card containerStyle={{borderRadius: 8, margin: 8}}>
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Avatar size="small" rounded source = {{uri:this.props.data.author.avatar}}/>
-                <Text style={{marginLeft: 8}}>{this.props.data.author.name}</Text>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{marginLeft: 8, fontSize: 8}}>{this.props.data.date}</Text>
-              </View>
-            </View>
-            <View style={{marginTop: 8}}>
-              <Text style={{fontWeight:'700'}}>{this.props.data.title}</Text>
-              {TextComponent}
-            </View>
-            <View style={{marginTop: 8, marginBottom: 6}}>
-              <Text style={{color: '#8154b9', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
-            </View>
-
-            <Card.Divider/>
-
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{alignItems: 'flex-start'}}>
+      if (this.props.data.id == 'get_new_item') {
+        return(
+          <TouchableOpacity onPress={this._onPress}>
+            <Card containerStyle={{borderRadius: 8, margin: 8, backgroundColor: '#97EBFF'}}>
+              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Icon
-                    name='chat-bubble'
-                    type='material-icons'
-                    size={16}
-                    color={this.props.data.commentsCount == 0 ? 'grey' : '#009789' }
-                  />
-                  {this.props.data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{this.props.data.commentsCount}</Text> }
+                  <Avatar size="small" source={require('../assets/img/add_item.png')}/>
+                  <View>
+                    <Text style={{marginLeft: 8, color: 'grey', fontWeight:'700'}}>Что в твоей голове?</Text>
+                    <Text style={{marginLeft: 8, color: '#009789'}}>Вдохновляй других, получай поддержку</Text>
+                  </View>
                 </View>
               </View>
-              <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                <Icon
-                  name='volunteer-activism'
-                  type='material-icons'
-                  color='grey'
-                  size={16}
-                />
-                <TouchableOpacity onPress = {this._onPressLike}>
-                  <Icon
-                    name='favorite'
-                    type='material-icons'
-                    color='grey'
-                    containerStyle = {{marginLeft: 8}}
-                    size={16}
-                    color={this.props.data.heartsCount == 0 ? 'grey' : 'red' }
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            </Card>
+          </TouchableOpacity>
+        )
+      }else{
+        return(
+          <TouchableOpacity onPress={this._onPress}>
+              <Card containerStyle={{borderRadius: 8, margin: 8}}>
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Avatar size="small" rounded source = {{uri:this.props.data.author.avatar}}/>
+                    <Text style={{marginLeft: 8}}>{this.props.data.author.name}</Text>
+                  </View>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{marginLeft: 8, fontSize: 8}}>{this.props.data.date}</Text>
+                  </View>
+                </View>
+                <View style={{marginTop: 8}}>
+                  <Text style={{fontWeight:'700'}}>{this.props.data.title}</Text>
+                  {TextComponent}
+                </View>
+                <View style={{marginTop: 8, marginBottom: 6}}>
+                  <Text style={{color: '#8154b9', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
+                </View>
 
-          </Card>
-      </TouchableOpacity>
-    );
+                <Card.Divider/>
+
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <View style={{alignItems: 'flex-start'}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Icon
+                        name='chat-bubble'
+                        type='material-icons'
+                        size={16}
+                        color={this.props.data.commentsCount == 0 ? 'grey' : '#009789' }
+                      />
+                      {this.props.data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{this.props.data.commentsCount}</Text> }
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                    <Icon
+                      name='volunteer-activism'
+                      type='material-icons'
+                      color='grey'
+                      size={16}
+                    />
+                    <TouchableOpacity onPress = {this._onPressLike}>
+                      <Icon
+                        name='favorite'
+                        type='material-icons'
+                        color='grey'
+                        containerStyle = {{marginLeft: 8}}
+                        size={16}
+                        color={this.props.data.heartsCount == 0 ? 'grey' : 'red' }
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+              </Card>
+          </TouchableOpacity>
+        )
+      }
   }
 }
 

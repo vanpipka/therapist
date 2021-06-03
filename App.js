@@ -16,6 +16,7 @@ import Chat from './screens/ChatScreen';
 import User from './screens/UserScreen';
 import VideoCall from './screens/VideoCallScreen';
 import Article from './screens/ArticleScreen';
+import AddArticle from './screens/AddArticleScreen';
 //import VideoCall from './screens/VideoCallScreen';
 
 const Stack = createStackNavigator();
@@ -68,6 +69,11 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="Article"
                 component={Article}
+                options={{}}
+              />
+              <Stack.Screen
+                name="AddArticle"
+                component={AddArticle}
                 options={{}}
               />
               <Stack.Screen
