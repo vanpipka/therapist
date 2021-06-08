@@ -8,7 +8,8 @@ export function AssetExample(props) {
   return 'Привет всем присутствующим!';
 }
 
-_getTagsInfoFromAsyncStorage = async () => {
+export async function _getTagsInfoFromAsyncStorage() {
+  //await AsyncStorage.removeItem('tags');
   let tags = await AsyncStorage.getItem('tags');
   if (tags == null) {
       tags = await _getTagsInfo();
@@ -21,8 +22,6 @@ _getTagsInfoFromAsyncStorage = async () => {
 
 _getTagsInfo = async (props) => {
 
-    console.log("_getTagsInfo");
-
     if (!firebase.apps.length) {
       let FIREBASECONFIG = Const.FIREBASECONFIG;
       firebase.initializeApp(FIREBASECONFIG);
@@ -34,8 +33,8 @@ _getTagsInfo = async (props) => {
 
     snapshot.forEach((doc) => {
           let data = doc.data();
-          dataArray.push({id: doc.id, date: data.name});
-          console.log(dataArray);
+          dataArray.push({id: doc.id, name: doc.id});
+          //console.log(data);
     });
 
     let tagsString = JSON.stringify({data: dataArray});

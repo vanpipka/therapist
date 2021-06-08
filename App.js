@@ -17,6 +17,8 @@ import User from './screens/UserScreen';
 import VideoCall from './screens/VideoCallScreen';
 import Article from './screens/ArticleScreen';
 import AddArticle from './screens/AddArticleScreen';
+import HealthConditions from './screens/HealthConditionsScreen';
+
 //import VideoCall from './screens/VideoCallScreen';
 
 const Stack = createStackNavigator();
@@ -80,6 +82,11 @@ export default class App extends React.Component {
                 name="User"
                 component={User}
                 options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="HealthConditions"
+                component={HealthConditions}
+                options={{headerShown: true}}
               />
               <Stack.Screen
                 name="VideoCall"

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Platform, Alert, ScrollView, ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
-import { Card, ListItem, Button, Avatar, Icon } from 'react-native-elements';
+import { Card, ListItem, Button, Avatar, Icon, Input } from 'react-native-elements';
 import { _setTagsInfoFromAsyncStorage } from '../components/WebAPI';
 import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
-import { Input } from 'react-native-elements';
 import { GetDateView, ConvertStringToDate, ConvertDateToString } from '../components/WebAPI';
 import { v4 as uuidv4 } from 'uuid';
 //import auth from '@react-native-firebase/auth';
@@ -19,6 +18,7 @@ export default class Article extends React.PureComponent {
 
   static navigationOptions = ({navigation, screenProps}) => {
 
+    console.log('navigationOptions');
     console.log(navigation.state.params);
     const params = navigation.state.params || {};
 
@@ -36,13 +36,18 @@ export default class Article extends React.PureComponent {
       super(props);
       const { navigation } = this.props;
 
-      this.state=this.props.route.params;
-      this.state['comments'] = [];
-      this.state['message'] = '';
-      this.state['refreshdata'] = true;
+      this.state = {user: this.props.route.params['user'],
+                    headline: "",
+                    text: "",
+                    errorText: ""};
+
+      console.log("AddArticle constructor");
+      console.log(this.state);
+
   }
 
   _setNavigationParams() {
+    console.log("AddArticle _setNavigationParams");
     this.props.navigation.setParams({title: 'Новая заметка'});
   }
 
@@ -53,28 +58,47 @@ export default class Article extends React.PureComponent {
 
   _sendMessageAsync = async (props) => {
 
-    if (this.state.message == '') {
+    if (this.state.text == '') {
+        this.setState({errorText: 'Это поле обязательно для заполнения'});
         return
     }
     console.log("_sendMessageAsync");
+
+    let text = JSON.stringify({data: [
+              		{
+              			text: this.state.text,
+              			type: "text",
+              			style: {
+              				color: "black",
+              				fontSize: 12
+              			}
+              		}
+              	]
+              });
+
+    console.log(text);
 
     let database  = firebase.firestore();
     let data      = {
             author: this.state.user,
             date: ConvertDateToString(new Date()),
-            link: this.state.id,
-            text: this.state.message,
-            verified: false
+            text: this.state.text,
+            commentsCount: 0,
+            heartsCount: 0,
+            original: "",
+            tags: [database.doc('tags/Relationship')],
+            title: this.state.headline,
+            text: text,
       }
 
 
-    database.collection("comments").doc(''+uuidv4()).set(data).then(() => {
-          data['createdAt'] = GetDateView(ConvertStringToDate(data.date))
-          this.state.comments.push(data);
-          this.setState({message: ''});
+    database.collection("news").doc(''+uuidv4()).set(data).then(() => {
+        /*  data['createdAt'] = GetDateView(ConvertStringToDate(data.date))
+          this.state.comments.push(data);*/
+          this.setState({text: '', headline: ''});
       })
       .catch((error) => {
-          Alert.alert("Ошибка", "Не удалось добавить комментарий");
+          Alert.alert("Ошибка", "Не удалось добавить заметку");
       });
   }
 
@@ -82,7 +106,40 @@ export default class Article extends React.PureComponent {
 
       return(
         <View style={styles.container}>
-          <Text>блаблабла</Text>
+            <View style={{backgroundColor: 'white', width: '100%', flex: 1, borderRadius: 10, marginBottom: 8, padding: 8, borderWidth: 2, borderColor: '#d6d8db',}}>
+
+                <Input
+                    style={{width: '100%',  fontWeight: 'bold'}}
+                    onChangeText={text => this.setState({headline: text})}
+                    value={this.state.headline}
+                    placeholder="Введите заголовок"
+                  />
+                <Input
+                  style={{width: '100%'}}
+                  multiline
+                  numberOfLines={8}
+                  onChangeText={text => this.setState({text: text, errorText: ""})}
+                  value={this.state.text}
+                  placeholder="Введите текст заметки"
+                  errorMessage={this.state.errorText}
+                />
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                  <Text style={{paddingLeft: 8}}>Состояние здоровья</Text>
+                    <TouchableOpacity
+                      style = {{margin: 8, color: '#5A00C4', fontSize: 12, alignItems: 'center',
+                        justifyContent: 'center', backgroundColor: '#5A00C4', height: 40,
+                        borderRadius: 50, width: 40}}
+                      onPress = {() => this.props.navigation.navigate("HealthConditions", {})}>
+                      <Text style = {{color: 'white', fontWeight: 'bold'}}>+</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+          <View style = {styles.redSection}>
+            <TouchableOpacity
+              onPress={this._sendMessageAsync}>
+              <Text style = {{color: 'white', fontWeight: 'bold'}}>Опубликовать</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       );
     }
@@ -91,8 +148,12 @@ export default class Article extends React.PureComponent {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#e2e3e5",
+    borderTopWidth: 0.5,
+    borderTopColor: '#d6d8db',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 8
   },
   logo:{
     fontWeight:"bold",
@@ -103,9 +164,12 @@ const styles = StyleSheet.create({
   redSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#D21C43',
+    backgroundColor: '#009789',
+    borderWidth: 2,
+    borderColor: '#009184',
     width: '100%',
-    height: 40,
+    height: 50,
+    borderRadius: 10
   },
   inputView:{
     width:"80%",
