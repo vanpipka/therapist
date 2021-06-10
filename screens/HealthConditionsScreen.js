@@ -37,7 +37,8 @@ export default class HealthConditions extends React.PureComponent {
       super(props);
       const { navigation } = this.props;
 
-      this.state = {list: [], refresh: false, loading: true};
+      this.state = {list: [], refresh: false, loading: true, tags: this.props.route.params.tags};
+
   }
 
   _setNavigationParams() {
@@ -51,13 +52,19 @@ export default class HealthConditions extends React.PureComponent {
   }
 
   _loadTagsInfo = async () => {
-    let res = await _getTagsInfoFromAsyncStorage();
+    let tags = this.state.tags;
+    let res  = await _getTagsInfoFromAsyncStorage();
     try {
       let tagsData = JSON.parse(res);
       let list = tagsData.data;
       list.forEach(function(item, i, tagsData) {
-        item['checked'] = false;
+        if (tags.indexOf(item['id']) >= 0) {
+          item['checked'] = true;
+        }else{
+          item['checked'] = false;
+        }
       });
+
       this.setState({loading: false, list: list})
     } catch (e) {
     } finally {
@@ -79,9 +86,17 @@ export default class HealthConditions extends React.PureComponent {
   };
 
   _saveHealthConditions = (props) => {
-    console.log('_saveHealthConditions');
-    console.log(this.state.list);
-    //this.props.na
+
+    let arr = [];
+
+    this.state.list.map((item, index) => {
+      if (item.checked === true) {
+        arr.push({id: item.id})
+      }
+    });
+
+    this.props.route.params.onGoBack(arr);
+    this.props.navigation.goBack();
   }
 
   render () {

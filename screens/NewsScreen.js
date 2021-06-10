@@ -18,7 +18,7 @@ export default class News extends React.PureComponent {
 
   static navigationOptions = ({navigation, screenProps}) => {
 
-    console.log(navigation.state.params);
+    //console.log(navigation.state.params);
     const params = navigation.state.params || {};
 
     return {
@@ -41,6 +41,7 @@ export default class News extends React.PureComponent {
           user: props.route.params,
           loading: true,
           refreshdata: true,
+          uniqueValue: 1,
           data: [],
       };
 
@@ -98,7 +99,7 @@ export default class News extends React.PureComponent {
     let database  = firebase.firestore();
     let iter      = 0;
     const snapshot = await database.collection('news').orderBy('date', 'desc').limit(10).get();
-    console.log('_LoadDataAsync_1');
+    //console.log('_LoadDataAsync_1');
     let dataArray = [];
 
     dataArray.push({
@@ -126,6 +127,7 @@ export default class News extends React.PureComponent {
             for (var i = 0; i < data.tags.length; i++) {
                 tags.push(data.tags[i].id);
             };
+
             dataArray.push({
                             id:     doc.id,
                             date:   GetDateView(ConvertStringToDate(data.date)),
@@ -135,6 +137,7 @@ export default class News extends React.PureComponent {
                             type:   data.type,
                             commentsCount: data.commentsCount,
                             heartsCount: data.heartsCount,
+                            liked: (Number(data.heartsCount) > 0),
                             tags:   tags,
                             author: {
                                 id: data.author['id'],
@@ -146,7 +149,7 @@ export default class News extends React.PureComponent {
 
     });
 
-    this.setState({data: dataArray, loading: false, refreshdata: !this.state.refreshdata})
+    this.setState({data: dataArray, loading: false, refreshdata: !this.state.refreshdata, uniqueValue : this.state.uniqueValue+1})
 
   }
 
@@ -163,22 +166,24 @@ export default class News extends React.PureComponent {
 
   _onPressLike = (props) => {
 
-      let array = this.state.data;
+    //console.log('_onPressLike');
+
+      let array = Array.from(this.state.data);
 
       for (var i = 0; i < array.length; i++) {
 
         if (array[i].id == props.data.id) {
-          console.log(array[0].id);
+        //  console.log('id: '+array[i].id);
           if (array[i].heartsCount==1) {
             array[i].heartsCount = 0
           }else{
             array[i].heartsCount = 1
           }
-          console.log(array[i].heartsCount);
+          array[i].liked = array[i].heartsCount > 0;
         }
       }
 
-      this.setState({data: array, refreshdata: !this.state.refreshdata})
+      this.setState({data: array, refreshdata: !this.state.refreshdata, uniqueValue : this.state.uniqueValue+1})
 
       //Overlay
   };
@@ -193,6 +198,9 @@ export default class News extends React.PureComponent {
   );
 
   render() {
+
+  //  console.log('render '+this.state.uniqueValue);
+
       if (this.state.loading == true) {
           return(
             <View style={styles.container}>
@@ -204,13 +212,13 @@ export default class News extends React.PureComponent {
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 8}}>
             <FlatList
               data={this.state.data}
-              extraData={this.state.refreshdata}
-              keyExtractor={(item, index) => {return item.id;}}
+              extraData={this.props.uniqueValue}
+              keyExtractor={(item, index) => item.id}
               renderItem={this._renderItem}
               refreshControl={
                 <RefreshControl
                   refreshing={this.state.loading}
-                  onRefresh={this._loadAsync}
+                  onRefresh={this._loadDataAsync}
                 />
               }
             />
@@ -222,20 +230,29 @@ export default class News extends React.PureComponent {
 
 class MyListItem extends React.PureComponent {
 
+  constructor(props) {
+      super(props);
+      this.state={data: this.props.data, refresh: false};
+  }
+
   _onPress = () => {
     this.props.onPressItem(this.props);
   };
 
   _onPressLike = () => {
-    this.props.onPressLike(this.props);
+    //console.log('_onPressLike'+this.state.data.liked);
+    let newData = this.state.data;
+    newData.liked = !newData.liked;
+    this.setState({data: newData, refresh: !this.state.refresh});
   };
 
   render() {
 
-    console.log('MyListItem render');
+    //console.log('MyListItem render');
+    let {data} = this.state;
 
     let TextComponent = null;
-    let text  = this.props.data.text;
+    let text  = data.text;
     let textJSON  = {};
 
     try {
@@ -245,7 +262,7 @@ class MyListItem extends React.PureComponent {
 
           let text = textJSON.data[i].text;
 
-          console.log(i);
+          //console.log(i);
           if (i == 1) {
             text = text + "...";
             TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
@@ -291,19 +308,19 @@ class MyListItem extends React.PureComponent {
               <Card containerStyle={{borderRadius: 8, margin: 8}}>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Avatar size="small" rounded source = {{uri:this.props.data.author.avatar}}/>
-                    <Text style={{marginLeft: 8}}>{this.props.data.author.name}</Text>
+                    <Avatar size="small" rounded source = {{uri:data.author.avatar}}/>
+                    <Text style={{marginLeft: 8}}>{data.author.name}</Text>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{marginLeft: 8, fontSize: 8}}>{this.props.data.date}</Text>
+                    <Text style={{marginLeft: 8, fontSize: 8}}>{data.date}</Text>
                   </View>
                 </View>
                 <View style={{marginTop: 8}}>
-                  <Text style={{fontWeight:'700'}}>{this.props.data.title}</Text>
+                  <Text style={{fontWeight:'700'}}>{data.title}</Text>
                   {TextComponent}
                 </View>
                 <View style={{marginTop: 8, marginBottom: 6}}>
-                  <Text style={{color: '#8154b9', fontSize: 12, }}>{this.props.data.tags.join(' ,')}</Text>
+                  <Text style={{color: '#8154b9', fontSize: 12, }}>{data.tags.join(' ,')}</Text>
                 </View>
 
                 <Card.Divider/>
@@ -315,9 +332,9 @@ class MyListItem extends React.PureComponent {
                         name='chat-bubble'
                         type='material-icons'
                         size={16}
-                        color={this.props.data.commentsCount == 0 ? 'grey' : '#009789' }
+                        color={data.commentsCount == 0 ? 'grey' : '#009789' }
                       />
-                      {this.props.data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{this.props.data.commentsCount}</Text> }
+                      {data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{data.commentsCount}</Text> }
                     </View>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
@@ -334,7 +351,7 @@ class MyListItem extends React.PureComponent {
                         color='grey'
                         containerStyle = {{marginLeft: 8}}
                         size={16}
-                        color={this.props.data.heartsCount == 0 ? 'grey' : 'red' }
+                        color={data.liked ? 'red' : 'grey' }
                       />
                     </TouchableOpacity>
                   </View>

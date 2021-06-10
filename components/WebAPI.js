@@ -9,7 +9,7 @@ export function AssetExample(props) {
 }
 
 export async function _getTagsInfoFromAsyncStorage() {
-  //await AsyncStorage.removeItem('tags');
+  await AsyncStorage.removeItem('tags');
   let tags = await AsyncStorage.getItem('tags');
   if (tags == null) {
       tags = await _getTagsInfo();
@@ -65,8 +65,8 @@ export function ConvertDateToString(date){
 
 export function ConvertStringToDate(stringDate){
 
-  console.log('stringDate');
-  console.log(stringDate);
+  //console.log('stringDate');
+  //console.log(stringDate);
 
   if (stringDate == undefined) {
       return new Date()
@@ -98,10 +98,10 @@ export function GetDateView(date){
   let getMinutes = "00"+date.getMinutes(); // 0
   let getSeconds = "00"+date.getSeconds(); // 0
 
-  console.log("//------------------");
+  /*console.log("//------------------");
   console.log(today);
   console.log(d);
-  console.log("//------------------");
+  console.log("//------------------");*/
 
   if(today <= d){
     convertdate = getHours.slice(-2)+':'+

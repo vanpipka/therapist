@@ -34,20 +34,18 @@ export default class Article extends React.PureComponent {
 
   constructor(props) {
       super(props);
+      //this.refreshtags = this.refreshtags.bind(this);
       const { navigation } = this.props;
 
       this.state = {user: this.props.route.params['user'],
                     headline: "",
                     text: "",
-                    errorText: ""};
-
-      console.log("AddArticle constructor");
-      console.log(this.state);
+                    errorText: "",
+                    tags: []};
 
   }
 
   _setNavigationParams() {
-    console.log("AddArticle _setNavigationParams");
     this.props.navigation.setParams({title: 'Новая заметка'});
   }
 
@@ -56,29 +54,40 @@ export default class Article extends React.PureComponent {
     //this._loadDataAsync();
   }
 
+  refreshtags(props) {
+    console.log('refresh');
+    console.log(props);
+    let arr = [];
+    props.forEach(function(item, i) {
+      arr.push(item.id)
+    });
+    this.setState({tags: arr})
+  }
+
   _sendMessageAsync = async (props) => {
 
     if (this.state.text == '') {
         this.setState({errorText: 'Это поле обязательно для заполнения'});
         return
     }
-    console.log("_sendMessageAsync");
-
-    let text = JSON.stringify({data: [
-              		{
-              			text: this.state.text,
-              			type: "text",
-              			style: {
-              				color: "black",
-              				fontSize: 12
-              			}
-              		}
-              	]
-              });
-
-    console.log(text);
-
     let database  = firebase.firestore();
+    let text      = JSON.stringify({data: [
+                		{
+                			text: this.state.text,
+                			type: "text",
+                			style: {
+                				color: "black",
+                				fontSize: 12
+                			}
+                		}
+                	]
+                });
+
+    let tags = [];
+    this.state.tags.forEach(function(item, i) {
+      tags.push(database.doc('tags/'+item))
+    });
+
     let data      = {
             author: this.state.user,
             date: ConvertDateToString(new Date()),
@@ -86,7 +95,7 @@ export default class Article extends React.PureComponent {
             commentsCount: 0,
             heartsCount: 0,
             original: "",
-            tags: [database.doc('tags/Relationship')],
+            tags: tags,
             title: this.state.headline,
             text: text,
       }
@@ -103,6 +112,10 @@ export default class Article extends React.PureComponent {
   }
 
   render() {
+
+    let tags = this.state.tags.map((item)=>(<View style={styles.tag}>
+                                              <Text style={{color: "#5A00C4"}}>{item}</Text>
+                                            </View>))
 
       return(
         <View style={styles.container}>
@@ -125,13 +138,17 @@ export default class Article extends React.PureComponent {
                 />
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                   <Text style={{paddingLeft: 8}}>Состояние здоровья</Text>
-                    <TouchableOpacity
-                      style = {{margin: 8, color: '#5A00C4', fontSize: 12, alignItems: 'center',
+                  <TouchableOpacity
+                      style = {{margin: 8, fontSize: 12, alignItems: 'center',
                         justifyContent: 'center', backgroundColor: '#5A00C4', height: 40,
                         borderRadius: 50, width: 40}}
-                      onPress = {() => this.props.navigation.navigate("HealthConditions", {})}>
+                      onPress = {() => this.props.navigation.navigate("HealthConditions",
+                                                        {tags: this.state.tags, onGoBack: this.refreshtags.bind(this)})}>
                       <Text style = {{color: 'white', fontWeight: 'bold'}}>+</Text>
-                    </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
+                <View style={{paddingLeft: 8, flexWrap: 'wrap', flexDirection: 'row'}}>
+                  {tags}
                 </View>
             </View>
           <View style = {styles.redSection}>
@@ -171,14 +188,16 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 10
   },
-  inputView:{
-    width:"80%",
-    backgroundColor:"#465881",
-    borderRadius:25,
-    height:50,
-    marginBottom:20,
-    justifyContent:"center",
-    padding:20
+  tag:{
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#5A00C4',
+    borderRadius: 50,
+    padding: 4,
+    marginRight: 8,
+    marginBottom: 8
   },
   inputText:{
     height:50,
