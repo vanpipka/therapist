@@ -62,7 +62,7 @@ export default class Register extends React.PureComponent {
                   .set(data)
                   .then(() => {
                       console.log(data);
-                      this.props.navigation.navigate('Main', {user: data})
+                      this.props.navigation.replace('Main', {user: data})
                   })
                   .catch((error) => {
                       alert(error)
@@ -122,7 +122,7 @@ export default class Register extends React.PureComponent {
 
                 <TouchableOpacity
                   style={{marginTop: 16, alignItems: 'center', justifyContent: 'center'}}
-                    onPress = {()=>{this.props.navigation.navigate('Login')}}>
+                    onPress = {()=>{this.props.navigation.replace('Login')}}>
                   <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
                   <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Войти</Text>
                 </TouchableOpacity>

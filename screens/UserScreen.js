@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, ScrollView, View, StyleSheet, AsyncStorage, ActivityIndicator, ImageBackground, TouchableOpacity } from 'react-native';
+import { Button, ScrollView, View, StyleSheet, AsyncStorage, ActivityIndicator, ImageBackground, TouchableOpacity, FlatList } from 'react-native';
 import * as firebase from 'firebase';
 import Colors from '../constants/Colors';
 import { Text, ListItem, Avatar, Card, Icon, Divider, Badge } from 'react-native-elements'
-import { GetDateView, ConvertStringToDate } from '../components/WebAPI';
+import { GetDateView, ConvertStringToDate, _getUserIDFromAsyncStorage } from '../components/WebAPI';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
+import ArticleItem from '../components/ArticleItem';
 import ErrorPage from '../screens/ErrorPage';
 
 export default class User extends React.Component {
@@ -12,9 +13,14 @@ export default class User extends React.Component {
   constructor(props) {
     super(props);
 
+    console.log("dddddddddddddddddddddddddddddd");
+    console.log(props.route.params);
+    console.log("dddddddddddddddddddddddddddddd");
+
     let params = props.route.params || {};
     params['loading'] = true;
-    params['userInfo'] = {};
+    params['activityloading'] = true;
+    params['articles'] = [];
     params['error'] = {value: false, text: ''};
     this.state = params;
 
@@ -34,6 +40,7 @@ export default class User extends React.Component {
     firebase.auth().signInAnonymously()
       .then(() => {
         this._LoadDataAsync_1();
+        this._LoadActivityAsync_1();
       })
       .catch((error) => {
         var errorCode = error.code;
@@ -54,18 +61,18 @@ export default class User extends React.Component {
       return;
     }
 
-    const docRef = await database.collection('userInfo').doc(this.state.id);
+    const docRef = await database.collection('userInfo').doc(this.state.userInfo.id);
 
     docRef.get().then((doc) => {
         if (doc.exists) {
             let data    = doc.data();
-            data['id']  = this.state.id;
+            data['id']  = doc.id;
             if (data['tags'] == undefined) {
                 data['tags'] = []
             }
             this.setState({userInfo: data, loading: false})
         } else {
-            console.log("no user information!");
+            console.log("No user information!");
         }
     }).catch((error) => {
         console.log("Error getting document:", error);
@@ -73,6 +80,43 @@ export default class User extends React.Component {
 
   }
 
+  _LoadActivityAsync_1 = async () => {
+
+    let database      = firebase.firestore();
+    let articlesArray  = [];
+
+    if (this.state.id == '') {
+      this.setState({error: {value: true, text: 'mistake'}, loading: false})
+      return;
+    }
+
+    /*const query = await database.collection("/userInfo/"+this.state.user.id+"/likes").get();
+
+    query.forEach((doc) => {
+            let data = doc.data();
+            likesArray.push(doc.id);
+    });*/
+
+    console.log(this.state);
+
+    const query = await database.collection('news').where('author.id', '==', this.state.userInfo.id).get();
+
+    query.forEach((doc) => {
+            let data = doc.data();
+            let tags = [];
+
+            for (var i = 0; i < data.tags.length; i++) {
+                tags.push(data.tags[i].id);
+            };
+
+            data['date'] = GetDateView(ConvertStringToDate(data.date));
+            data['tags'] = tags,
+            articlesArray.push(data);
+    });
+
+    this.setState({articles: articlesArray, activityloading: false})
+
+  }
   _onPressVideo = async () => {
 
     this.props.navigation.navigate('VideoCall');
@@ -86,24 +130,44 @@ export default class User extends React.Component {
                        id: this.state.userInfo.id,
                        avatar: this.state.userInfo.avatar};
 
-    this.props.navigation.navigate('Chat', {user: {id: currentUser,}, id: null, recipient: recipient});
+    let data = {user: {id: currentUser,}, id: null, recipient: recipient};
+
+    console.log(this.state.userInfo);
+
+    this.props.navigation.navigate('Chat', data);
 
   }
 
   _onCloseError = (props) => {
-    //console.log('[eq]');
     this.props.navigation.goBack();
   };
+
+  _onPressItem = (props) => {
+
+      props.data['user'] = this.state.user;
+      this.props.navigation.navigate("Article", props.data);
+
+  };
+
+  _renderItem = ({item}) => (
+      <ArticleItem
+        key = {item.id}
+        onPressItem={this._onPressItem}
+        shortCard={true}
+        data={item}
+        user={this.state.user}
+      />
+  );
 
   render() {
 
     if (this.state.loading == true) {
         return(
-          <View>
+          <View style = {{flex:1}}>
             <SafeAreaInsetsContext.Consumer>
               {insets => <View style={{ paddingTop: insets.top }} />}
             </SafeAreaInsetsContext.Consumer>
-            <View style={{flex: 1}}>
+            <View style={styles.container}>
                 <ActivityIndicator size="large" color={Colors.colors.mainGreen} />
             </View>
           </View>
@@ -119,6 +183,7 @@ export default class User extends React.Component {
       let {userInfo} = this.state;
       let healthConditionsBlock = null;
       let myStoryBlock = null;
+      let myArticleBlock = null;
 
       if (userInfo.tags.length == 0) {
           healthConditionsBlock =
@@ -155,7 +220,7 @@ export default class User extends React.Component {
       }
 
       if (userInfo.text == '' || userInfo.text == undefined){
-          myStoryBlock = <ListItem key="2" bottomDivider>
+          myStoryBlock = <ListItem key="5" bottomDivider>
             <View style={{flexDirection: "row", alignItems: 'center', marginTop: -12}}>
               <View style={{width: '50%'}}>
                 <Text style={{fontWeight:'bold'}}>История</Text>
@@ -171,7 +236,7 @@ export default class User extends React.Component {
           </ListItem>
       }else{
         myStoryBlock =
-          <ListItem key="2" bottomDivider>
+          <ListItem key="5" bottomDivider>
             <View style={{ marginTop: -12}}>
                 <Text style={{fontWeight:'bold'}}>История</Text>
                 <Text style={{color: "grey"}}>
@@ -179,6 +244,46 @@ export default class User extends React.Component {
                 </Text>
             </View>
           </ListItem>
+      }
+
+      if (this.state.activityloading){
+          myArticleBlock = <ListItem key="4" bottomDivider>
+            <View style={{ marginTop: -12, flex: 1}}>
+                <Text style={{fontWeight:'bold'}}>Записи</Text>
+                <View style={{alignItems: 'center', width: '100%'}}>
+                  <ActivityIndicator size="small" color={Colors.colors.mainGreen} />
+                </View>
+            </View>
+          </ListItem>
+      }else{
+        if (this.state.articles.length == 0) {
+          myArticleBlock =
+            <ListItem key="4" bottomDivider>
+              <View style={{ marginTop: -12}}>
+                  <Text style={{fontWeight:'bold'}}>Записи</Text>
+                  <Text style={{color: "grey"}}>
+                    "Этот пользователь еще ничего не публиковал"
+                  </Text>
+              </View>
+            </ListItem>
+        }else{
+          myArticleBlock =
+            <ListItem key="4" bottomDivider>
+              <View style={{ marginTop: -12}}>
+                  <Text style={{fontWeight:'bold'}}>Записи: {this.state.articles.length}</Text>
+                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 8}}>
+                    <FlatList
+                      style={{marginRight: -8, marginLeft: -8}}
+                      data={this.state.articles}
+                      extraData={this.props.uniqueValue}
+                      keyExtractor={(item, index) => item.id}
+                      renderItem={this._renderItem}
+                    />
+                  </View>
+              </View>
+            </ListItem>
+        }
+
       }
 
       return (
@@ -258,6 +363,7 @@ export default class User extends React.Component {
                 </ListItem>
                 {healthConditionsBlock}
                 {myStoryBlock}
+                {myArticleBlock}
               </ScrollView>
         </View >
       );
@@ -286,6 +392,10 @@ export default class User extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 0,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     flex: 1,

@@ -62,6 +62,7 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="Main"
                 component={Main}
+                options={{ title: 'My home' }}
               />
               <Stack.Screen
                 name="Chat"

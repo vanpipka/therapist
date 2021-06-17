@@ -41,7 +41,7 @@ export default class Login extends React.PureComponent {
       await AsyncStorage.setItem('user_name', user.name);
       await AsyncStorage.setItem('user_avatar', user.avatar);
 
-      this.props.navigation.navigate('Main', {user: user});
+      this.props.navigation.replace('Main', {user: user});
 
     } catch (error) {
 
@@ -121,7 +121,7 @@ export default class Login extends React.PureComponent {
 
             <TouchableOpacity
               style={{marginTop: 16, justifyContent: 'center', alignItems: 'center'}}
-              onPress = {()=>{this.props.navigation.navigate('Register')}}>
+              onPress = {()=>{this.props.navigation.replace('Register')}}>
               <Text style={{color: 'grey'}}>Еще не зарегистрированы?</Text>
               <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Зарегистрироваться</Text>
             </TouchableOpacity>

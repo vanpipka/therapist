@@ -118,7 +118,10 @@ export default class Article extends React.PureComponent {
                                             </View>))
 
       return(
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.container}
+          >
             <View style={{backgroundColor: 'white', width: '100%', flex: 1, borderRadius: 10, marginBottom: 8, padding: 8, borderWidth: 2, borderColor: '#d6d8db',}}>
 
                 <Input
@@ -127,6 +130,7 @@ export default class Article extends React.PureComponent {
                     value={this.state.headline}
                     placeholder="Введите заголовок"
                   />
+
                 <Input
                   style={{width: '100%'}}
                   multiline
@@ -136,6 +140,7 @@ export default class Article extends React.PureComponent {
                   placeholder="Введите текст заметки"
                   errorMessage={this.state.errorText}
                 />
+
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                   <Text style={{paddingLeft: 8}}>Состояние здоровья</Text>
                   <TouchableOpacity
@@ -157,7 +162,7 @@ export default class Article extends React.PureComponent {
               <Text style = {{color: 'white', fontWeight: 'bold'}}>Опубликовать</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       );
     }
 }

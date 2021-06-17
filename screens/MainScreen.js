@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Text, View } from 'react-native';
 import News from './NewsScreen';
 import Dialogs from './DialogsScreen';
+import {  StackActions } from 'react-navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 function SettingsScreen() {

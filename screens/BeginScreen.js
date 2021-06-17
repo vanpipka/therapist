@@ -92,11 +92,11 @@ export default class Begin extends React.PureComponent {
             <Button
               title="Начать"
               buttonStyle={{backgroundColor: Colors.colors.mainGreen}}
-              onPress={() => this.props.navigation.navigate('Register')}
+              onPress={() => this.props.navigation.replace('Register')}
               />
               <TouchableOpacity
                 style={{flexDirection: 'row', marginTop: 16, justifyContent: 'center'}}
-                onPress = {()=>{this.props.navigation.navigate('Login')}}>
+                onPress = {()=>{this.props.navigation.replace('Login')}}>
                 <Text style={{color: 'grey'}}>Уже зарегистрированы?</Text>
                 <Text style={{fontWeight: '700', color: Colors.colors.mainGreen}}> Войти</Text>
               </TouchableOpacity>

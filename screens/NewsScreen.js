@@ -3,13 +3,14 @@ import { Platform, Alert, ScrollView, ActivityIndicator, StyleSheet, Text, View,
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { Card, ListItem, Button, Avatar, Icon } from 'react-native-elements';
-import { _setTagsInfoFromAsyncStorage } from '../components/WebAPI';
+import { _getTagsInfoFromAsyncStorage } from '../components/WebAPI';
 import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
+import ArticleItem from '../components/ArticleItem';
 import * as firebase from 'firebase';
 import { Input } from 'react-native-elements';
-import { GetDateView, ConvertStringToDate } from '../components/WebAPI';
+import { GetDateView, ConvertStringToDate, ConvertDateToString } from '../components/WebAPI';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -57,23 +58,8 @@ export default class News extends React.PureComponent {
 
   componentDidMount(){
     this._setNavigationParams();
-    //this._loadTagsInfo();
     this._loadDataAsync();
   }
-
-  /*_loadTagsInfo = async () => {
-    console.log('before _setTagsInfoFromAsyncStorage');
-    let res = await _getTagsInfoFromAsyncStorage();
-    try {
-      let tagsData = JSON.parse(res);
-      console.log(tagsData);
-    } catch (e) {
-
-    } finally {
-
-    }
-
-  }*/
 
   _loadDataAsync = async () => {
 
@@ -96,11 +82,19 @@ export default class News extends React.PureComponent {
   }
 
   _LoadDataAsync_1 = async () => {
-    let database  = firebase.firestore();
-    let iter      = 0;
-    const snapshot = await database.collection('news').orderBy('date', 'desc').limit(10).get();
-    //console.log('_LoadDataAsync_1');
-    let dataArray = [];
+    let database    = firebase.firestore();
+    let iter        = 0;
+    let likesArray  = [];
+    let dataArray   = [];
+
+    const query = await database.collection("/userInfo/"+this.state.user.id+"/likes").get();
+
+    query.forEach((doc) => {
+            let data = doc.data();
+            likesArray.push(doc.id);
+    });
+
+    const snapshot  = await database.collection('news').orderBy('date', 'desc').limit(10).get();
 
     dataArray.push({
                     id:     'get_new_item',
@@ -117,8 +111,7 @@ export default class News extends React.PureComponent {
                         name: '',
                         avatar: ''
                     }
-                  }
-                );
+                  });
 
     snapshot.forEach((doc) => {
             let data = doc.data();
@@ -137,7 +130,7 @@ export default class News extends React.PureComponent {
                             type:   data.type,
                             commentsCount: data.commentsCount,
                             heartsCount: data.heartsCount,
-                            liked: (Number(data.heartsCount) > 0),
+                            liked: (likesArray.indexOf(doc.id) != -1),
                             tags:   tags,
                             author: {
                                 id: data.author['id'],
@@ -164,42 +157,17 @@ export default class News extends React.PureComponent {
       }
   };
 
-  _onPressLike = (props) => {
-
-    //console.log('_onPressLike');
-
-      let array = Array.from(this.state.data);
-
-      for (var i = 0; i < array.length; i++) {
-
-        if (array[i].id == props.data.id) {
-        //  console.log('id: '+array[i].id);
-          if (array[i].heartsCount==1) {
-            array[i].heartsCount = 0
-          }else{
-            array[i].heartsCount = 1
-          }
-          array[i].liked = array[i].heartsCount > 0;
-        }
-      }
-
-      this.setState({data: array, refreshdata: !this.state.refreshdata, uniqueValue : this.state.uniqueValue+1})
-
-      //Overlay
-  };
-
   _renderItem = ({item}) => (
-      <MyListItem
+      <ArticleItem
         key = {item.id}
         onPressItem={this._onPressItem}
-        onPressLike={this._onPressLike}
+        shortCard={true}
         data={item}
+        user={this.state.user}
       />
   );
 
   render() {
-
-  //  console.log('render '+this.state.uniqueValue);
 
       if (this.state.loading == true) {
           return(
@@ -227,143 +195,6 @@ export default class News extends React.PureComponent {
     }
   };
 }
-
-class MyListItem extends React.PureComponent {
-
-  constructor(props) {
-      super(props);
-      this.state={data: this.props.data, refresh: false};
-  }
-
-  _onPress = () => {
-    this.props.onPressItem(this.props);
-  };
-
-  _onPressLike = () => {
-    //console.log('_onPressLike'+this.state.data.liked);
-    let newData = this.state.data;
-    newData.liked = !newData.liked;
-    this.setState({data: newData, refresh: !this.state.refresh});
-  };
-
-  render() {
-
-    //console.log('MyListItem render');
-    let {data} = this.state;
-
-    let TextComponent = null;
-    let text  = data.text;
-    let textJSON  = {};
-
-    try {
-        textJSON  = JSON.parse(text);
-        TextArray = [];
-        for (var i = 0; i < textJSON.data.length; i++) {
-
-          let text = textJSON.data[i].text;
-
-          //console.log(i);
-          if (i == 1) {
-            text = text + "...";
-            TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
-            break;
-          }else{
-            TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
-          }
-
-        };
-
-        TextComponent = <ScrollView>
-                          {TextArray}
-                        </ScrollView>
-
-    } catch (e) {
-
-        if (text.length > 150) {
-          text = text.substr(0, 147)+"..."
-        }
-
-        TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
-    };
-
-      if (this.props.data.id == 'get_new_item') {
-        return(
-          <TouchableOpacity onPress={this._onPress}>
-            <Card containerStyle={{borderRadius: 8, margin: 8, backgroundColor: '#97EBFF'}}>
-              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Avatar size="small" source={require('../assets/img/add_item.png')}/>
-                  <View>
-                    <Text style={{marginLeft: 8, color: 'grey', fontWeight:'700'}}>Что в твоей голове?</Text>
-                    <Text style={{marginLeft: 8, color: '#009789'}}>Вдохновляй других, получай поддержку</Text>
-                  </View>
-                </View>
-              </View>
-            </Card>
-          </TouchableOpacity>
-        )
-      }else{
-        return(
-          <TouchableOpacity onPress={this._onPress}>
-              <Card containerStyle={{borderRadius: 8, margin: 8}}>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Avatar size="small" rounded source = {{uri:data.author.avatar}}/>
-                    <Text style={{marginLeft: 8}}>{data.author.name}</Text>
-                  </View>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{marginLeft: 8, fontSize: 8}}>{data.date}</Text>
-                  </View>
-                </View>
-                <View style={{marginTop: 8}}>
-                  <Text style={{fontWeight:'700'}}>{data.title}</Text>
-                  {TextComponent}
-                </View>
-                <View style={{marginTop: 8, marginBottom: 6}}>
-                  <Text style={{color: '#8154b9', fontSize: 12, }}>{data.tags.join(' ,')}</Text>
-                </View>
-
-                <Card.Divider/>
-
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <View style={{alignItems: 'flex-start'}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <Icon
-                        name='chat-bubble'
-                        type='material-icons'
-                        size={16}
-                        color={data.commentsCount == 0 ? 'grey' : '#009789' }
-                      />
-                      {data.commentsCount == 0 ? null : <Text style={{color: '#009789', fontSize: 12}}>{data.commentsCount}</Text> }
-                    </View>
-                  </View>
-                  <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                    <Icon
-                      name='volunteer-activism'
-                      type='material-icons'
-                      color='grey'
-                      size={16}
-                    />
-                    <TouchableOpacity onPress = {this._onPressLike}>
-                      <Icon
-                        name='favorite'
-                        type='material-icons'
-                        color='grey'
-                        containerStyle = {{marginLeft: 8}}
-                        size={16}
-                        color={data.liked ? 'red' : 'grey' }
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-              </Card>
-          </TouchableOpacity>
-        )
-      }
-  }
-}
-
 
 const styles = StyleSheet.create({
   container: {

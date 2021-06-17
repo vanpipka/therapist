@@ -8,6 +8,14 @@ export function AssetExample(props) {
   return 'Привет всем присутствующим!';
 }
 
+export async function _getUserIDFromAsyncStorage() {
+  //await AsyncStorage.removeItem('tags');
+  let user_id = await AsyncStorage.getItem('user_id');
+
+  return user_id
+
+};
+
 export async function _getTagsInfoFromAsyncStorage() {
   await AsyncStorage.removeItem('tags');
   let tags = await AsyncStorage.getItem('tags');

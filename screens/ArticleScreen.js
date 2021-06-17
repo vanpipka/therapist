@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Platform, Alert, ScrollView, ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { Card, ListItem, Button, Avatar, Icon } from 'react-native-elements';
-import { _setTagsInfoFromAsyncStorage } from '../components/WebAPI';
+import ArticleItem from '../components/ArticleItem';
 import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
@@ -121,75 +121,31 @@ export default class Article extends React.PureComponent {
       });
   }
 
+  _onPressItem = (props) => {
+      this.props.navigation.navigate("User", {user: {id: this.state.user.id,
+                                                    name: this.state.user.name,
+                                                    avatar: this.state.user.avatar}, 
+                                            userInfo: props.data.author});
+  };
+
   render() {
 
       let TextComponent = null;
-      let text  = this.state.text;
+      let text = this.state.text;
+      let item = this.state;
+      //console.log(this.state);
       let textJSON  = {};
-
-      try {
-          textJSON  = JSON.parse(text);
-          TextArray = [];
-          for (var i = 0; i < textJSON.data.length; i++) {
-            let text = textJSON.data[i].text;
-            TextArray.push(<Text key ={i} style={textJSON.data[i].style}>{text}</Text>);
-          };
-
-          TextComponent = <ScrollView>
-                            {TextArray}
-                          </ScrollView>
-
-      } catch (e) {
-          TextComponent = <Text style = {{color: "grey", fontSize: 12}}>{text}</Text>
-      };
 
         return (
           <View style={styles.container}>
-            <ScrollView>
-              <Card containerStyle={{borderRadius: 8, margin: 8, flex: 1}}>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <TouchableOpacity onPress = {() => this.props.navigation.navigate("User", this.state.author)}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <Avatar size="small" rounded source = {{uri:this.state.author.avatar}}/>
-                      <Text style={{marginLeft: 8}}>{this.state.author.name}</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{marginLeft: 8, fontSize: 8}}>{this.state.date}</Text>
-                  </View>
-                </View>
-                <View style={{marginTop: 8}}>
-                  <Text style={{fontWeight:'700'}}>{this.state.title}</Text>
-                  {TextComponent}
-                </View>
-                <View style={{marginTop: 8, marginBottom: 6}}>
-                  <Text style={{color: '#5A00C4', fontSize: 12, }}>{this.state.tags.join(' ,')}</Text>
-                </View>
-
-                <Card.Divider/>
-
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                    <Icon
-                      name='volunteer-activism'
-                      type='material-icons'
-                      color='grey'
-                      size={16}
-                    />
-                    <TouchableOpacity onPress = {this._onPressLike}>
-                      <Icon
-                        name='favorite'
-                        type='material-icons'
-                        color='grey'
-                        containerStyle = {{marginLeft: 8}}
-                        size={16}
-                        color={this.state.heartsCount == 0 ? 'grey' : 'red' }
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-              </Card>
+            <ScrollView style={{width: '100%'}}>
+              <ArticleItem
+                    key = {item.id}
+                    onPressItem={this._onPressItem}
+                    shortCard={false}
+                    data={item}
+                    user={this.state.user}
+              />
               <Card containerStyle={{borderRadius: 8, margin: 8}}>
                 {this.state.commentsCount == 0 ?
                     <Text style={{margin: 8, color: '#009789', fontSize: 12, fontWeight: '700'}}>Комментариев еще нет</Text> :
