@@ -3,6 +3,7 @@ import { Platform, Alert, ScrollView, ActivityIndicator, StyleSheet, Text, View,
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { Card, ListItem, Button, Avatar, Icon, Input } from 'react-native-elements';
+import AutoExpandingTextInput from '../components/AutoExpandingTextInput';
 import { _setTagsInfoFromAsyncStorage } from '../components/WebAPI';
 import Urls from '../constants/Urls';
 import Const from '../constants/Const';
@@ -113,7 +114,7 @@ export default class Article extends React.PureComponent {
 
   render() {
 
-    let tags = this.state.tags.map((item)=>(<View style={styles.tag}>
+    let tags = this.state.tags.map((item)=>(<View style={styles.tag} id = {item}>
                                               <Text style={{color: "#5A00C4"}}>{item}</Text>
                                             </View>))
 
@@ -122,7 +123,7 @@ export default class Article extends React.PureComponent {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}
           >
-            <View style={{backgroundColor: 'white', width: '100%', flex: 1, borderRadius: 10, marginBottom: 8, padding: 8, borderWidth: 2, borderColor: '#d6d8db',}}>
+            <View key={1} style={{backgroundColor: 'white', width: '100%', flex: 1, borderRadius: 10, marginBottom: 8, padding: 8, borderWidth: 2, borderColor: '#d6d8db',}}>
 
                 <Input
                     style={{width: '100%',  fontWeight: 'bold'}}
@@ -130,16 +131,12 @@ export default class Article extends React.PureComponent {
                     value={this.state.headline}
                     placeholder="Введите заголовок"
                   />
-
-                <Input
-                  style={{width: '100%'}}
-                  multiline
-                  numberOfLines={8}
-                  onChangeText={text => this.setState({text: text, errorText: ""})}
-                  value={this.state.text}
-                  placeholder="Введите текст заметки"
-                  errorMessage={this.state.errorText}
-                />
+                <AutoExpandingTextInput
+                      placeholder="Введите текст"
+                      styles={{width: '100%', fontSize: 16, margin: 9}}
+                      multiline
+                      onContentSizeChange = {(text)=>{}}
+                      onChangeText = {(text)=>this.setState({text: text})}/>
 
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                   <Text style={{paddingLeft: 8}}>Состояние здоровья</Text>
@@ -166,6 +163,16 @@ export default class Article extends React.PureComponent {
       );
     }
 }
+
+/*<Input
+  style={{width: '100%'}}
+  multiline
+  numberOfLines={8}
+  onChangeText={text => this.setState({text: text, errorText: ""})}
+  value={this.state.text}
+  placeholder="Введите текст заметки"
+  errorMessage={this.state.errorText}
+/>*/
 
 const styles = StyleSheet.create({
   container: {

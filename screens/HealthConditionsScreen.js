@@ -111,7 +111,7 @@ export default class HealthConditions extends React.PureComponent {
 
     return (
       <View style={styles.container}>
-        <ScrollView style={{width: '100%'}}>
+        <ScrollView style={{width: '100%', padding: 0}}>
 
           {this.state.list.map((item) => <MyListItem
                                               key = {item.id}
@@ -141,6 +141,7 @@ class MyListItem extends React.PureComponent {
     return (
       <CheckBox
         left
+        containerStyle={{marginRight: 0, marginLeft: 0}}
         onPress={this._setBooleanState}
         title={props.value.name}
         checked={props.value.checked}
@@ -162,6 +163,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#d6d8db',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 8
   },
   redSection: {
     alignItems: 'center',
@@ -170,6 +172,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#009184',
     width: '100%',
-    height: 50
+    height: 50,
+    borderRadius: 10,
+    marginTop: 8
+
   }
 });

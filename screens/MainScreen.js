@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Text, View } from 'react-native';
 import News from './NewsScreen';
+import TestsScreen from './MainTestsScreen';
 import Dialogs from './DialogsScreen';
 import {  StackActions } from 'react-navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -32,6 +33,11 @@ export default function Main({route, navigation}) {
         <Tab.Screen
             name="Dialogs"
             component={Dialogs}
+            initialParams={user}
+        />
+        <Tab.Screen
+            name="Тесты"
+            component={TestsScreen}
             initialParams={user}
         />
         <Tab.Screen

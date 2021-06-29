@@ -11,6 +11,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Begin from './screens/BeginScreen';
 import Login from './screens/LoginScreen';
 import Register from './screens/RegisterScreen';
+import TestsList from './screens/TestsScreen';
+import Test from './screens/TestScreen';
 import Main from './screens/MainScreen';
 import Chat from './screens/ChatScreen';
 import User from './screens/UserScreen';
@@ -52,6 +54,16 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="Login"
                 component={Login}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="TestsList"
+                component={TestsList}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Test"
+                component={Test}
                 options={{ headerShown: false }}
               />
               <Stack.Screen

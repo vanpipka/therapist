@@ -9,6 +9,7 @@ import Const from '../constants/Const';
 import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
 import { Input } from 'react-native-elements';
+import AutoExpandingInputSection from '../components/AutoExpandingInputSection';
 import { GetDateView, ConvertStringToDate, ConvertDateToString } from '../components/WebAPI';
 import { v4 as uuidv4 } from 'uuid';
 //import auth from '@react-native-firebase/auth';
@@ -96,7 +97,7 @@ export default class Article extends React.PureComponent {
 
   _sendMessageAsync = async (props) => {
 
-    if (this.state.message == '') {
+    if (props.text == '') {
         return
     }
     console.log("_sendMessageAsync");
@@ -106,15 +107,17 @@ export default class Article extends React.PureComponent {
             author: this.state.user,
             date: ConvertDateToString(new Date()),
             link: this.state.id,
-            text: this.state.message,
+            text: props.text,
             verified: false
       }
 
 
     database.collection("comments").doc(''+uuidv4()).set(data).then(() => {
           data['createdAt'] = GetDateView(ConvertStringToDate(data.date))
-          this.state.comments.push(data);
-          this.setState({message: ''});
+
+          let comArray = this.state.comments;
+          comArray.push(data);
+          this.setState({message: '', comments: comArray});
       })
       .catch((error) => {
           Alert.alert("Ошибка", "Не удалось добавить комментарий");
@@ -124,7 +127,7 @@ export default class Article extends React.PureComponent {
   _onPressItem = (props) => {
       this.props.navigation.navigate("User", {user: {id: this.state.user.id,
                                                     name: this.state.user.name,
-                                                    avatar: this.state.user.avatar}, 
+                                                    avatar: this.state.user.avatar},
                                             userInfo: props.data.author});
   };
 
@@ -171,24 +174,8 @@ export default class Article extends React.PureComponent {
               </Card>
 
             </ScrollView>
-            <View style = {styles.greySection}>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={(message) => this.setState({message})}
-                value={this.state.message}
-                placeholder = 'Введите сообщение'
-              />
-              <TouchableOpacity
-                style={{justifyContent: 'flex-end', width: '10%'}}
-                onPress={this._sendMessageAsync}>
-                <Icon
-                  name='send'
-                  type='material-icons'
-                  color='grey'
-                  size={16}
-                />
-              </TouchableOpacity>
-            </View>
+            <AutoExpandingInputSection
+              onPress={this._sendMessageAsync}/>
           </View>
       );
     }
@@ -253,6 +240,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     paddingLeft: 8,
+    marginTop: 8
   },
   textInput: {
     backgroundColor: 'white',
@@ -261,5 +249,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     paddingLeft: 8,
     width: '90%',
+    maxHeight: 80
   },
 });
