@@ -5,6 +5,7 @@ import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
+import { v4 as uuidv4 } from 'uuid';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -128,6 +129,50 @@ export default class TestsScreen extends React.PureComponent {
       }*/
   };
 
+  _sendMessageAsync = async (props) => {
+
+    let database  = firebase.firestore();
+
+    console.log('_sendMessageAsync');
+    let data      = {
+            description: "",
+            group: "",
+            image_url: "",
+            name:  "",
+            questions: [
+                {name: "", number: 1, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 2, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 3, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 4, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 5, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 6, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 7, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 8, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 9, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 10, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]},
+                {name: "", number: 11, answers: [{name: "", number: 1, score:0},{name: "", number: 2, score:1}, {name: "", number: 3, score:2}, {name: "", number: 4, score:3}, {name: "", number: 5, score:4}]}
+            ],
+            result: [
+                {from: 0, to: 0, text: "", suggestedAction: ""},
+                {from: 0, to: 0, text: "", suggestedAction: ""},
+                {from: 0, to: 0, text: "", suggestedAction: ""},
+                {from: 0, to: 0, text: "", suggestedAction: ""},
+                {from: 0, to: 0, text: "", suggestedAction: ""}
+            ]
+
+      }
+
+
+    database.collection("tests").doc(''+uuidv4()).set(data).then(() => {
+        /*  data['createdAt'] = GetDateView(ConvertStringToDate(data.date))
+          this.state.comments.push(data);*/
+          console.log('complite');
+      })
+      .catch((error) => {
+          Alert.alert("Ошибка", "Не удалось добавить заметку");
+      });
+  }
+
   render() {
 
     let width = Dimensions.get("window").width/3;
@@ -171,6 +216,9 @@ export default class TestsScreen extends React.PureComponent {
                   ))
               }
             </ScrollView>
+            <TouchableOpacity onPress = {() => this._sendMessageAsync()}>
+                <Text>Добавить тест</Text>
+            </TouchableOpacity>
           </View>
       );
     }

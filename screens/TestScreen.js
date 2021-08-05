@@ -37,6 +37,8 @@ export default class Test extends React.PureComponent {
       console.log(props.route.params);
 
       this.state={
+          currentQuantity: 0,
+          quantity: 0,
           data: props.route.params,
           step: 0,
           answer: -1,
@@ -129,6 +131,8 @@ export default class Test extends React.PureComponent {
 
       console.log('=========================================');
       console.log(progress);
+      console.log("QUANTITY");
+      console.log(this.state.currentQuantity);
 
       if (question != undefined) {
         return (
@@ -141,23 +145,31 @@ export default class Test extends React.PureComponent {
               <ProgressBar progress={progress} color={'#009789'}/>
             </View>
             <Text style={{color: "#009789", fontSize: 18, margin: 8}}>{question.name}</Text>
-            <ScrollView>
-              <View key={"1"}>
+            <ScrollView style={{padding: 8}}>
+
               {
                 question.answers.map((l, i) => (
-                  <RadioButton
-                    value   = "hfllllff"
-                    status  = {this.state.answer === l.number ? 'checked' : 'unchecked' }
-                    onPress ={() => this.setState({answer: l.number})}
-                  />
+                  <View key={i}>
+                    <TouchableOpacity style={[{flexDirection: 'row', alignItems: 'center', padding: 8, marginBottom: 8},
+                          {backgroundColor: this.state.answer === l.number ? '#a1f0ea' : '#f9fafe'}]}
+                      onPress ={() => this.setState({answer: l.number, currentQuantity: l.score})}>
+                      <RadioButton
+                        color   = 'white'
+                        value   = {l.name}
+                        status  = {this.state.answer === l.number ? 'checked' : 'unchecked' }
+                        onPress ={() => this.setState({answer: l.number, currentQuantity: l.score})}
+                      />
+                      <Text style={{color: "grey"}}>{l.name}</Text>
+                    </TouchableOpacity>
+                  </View>
                 ))
               }
-              </View>
+
             </ScrollView>
             <View style = {{margin: 8}}>
               <View style = {styles.redSection}>
                 <TouchableOpacity
-                  onPress={()=>{this.setState({step: this.state.step+1, answers: -1})}}>
+                  onPress={()=>{this.setState({step: this.state.step+1, answers: -1, quantity: this.state.quantity +this.state.currentQuantity})}}>
                   <Text style = {{color: 'white', fontWeight: 'bold'}}>Дальше</Text>
                 </TouchableOpacity>
               </View>
@@ -184,7 +196,7 @@ export default class Test extends React.PureComponent {
                     </TouchableOpacity>
                   </ImageBackground>
                 </View>
-                <Text style={{color: "#009789", fontSize: 18, margin: 8}}>КОНЕЦ</Text>
+                <Text style={{color: "#009789", fontSize: 18, margin: 8}}>Ваш результат: {this.state.quantity}</Text>
               </View>
             </ScrollView>
           </View>
