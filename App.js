@@ -74,17 +74,17 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="Main"
                 component={Main}
-                options={{ title: 'My home' }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="Chat"
                 component={Chat}
-                options={{}}
+                options={({ route }) => ({ title: route.params.recipient.name})}
               />
               <Stack.Screen
                 name="Article"
                 component={Article}
-                options={{}}
+                options={({ route }) => ({ title: "Статья"})}
               />
               <Stack.Screen
                 name="AddArticle"

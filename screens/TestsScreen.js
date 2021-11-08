@@ -132,11 +132,11 @@ export default class TestsList extends React.PureComponent {
                 <TouchableOpacity key={i} style={{width: width, marginBottom: 8}} onPress={()=>{this.props.navigation.navigate("Test", l)}}>
                   <Card containerStyle={[styles.card]}>
                     <View style={{flexDirection: 'row'}}>
-                      <View style={{height: 100, borderRadius: 10, padding: 8}}>
-                        <ImageBackground source={{uri: l.image_url}} style={{width: 100, height: '100%'}} imageStyle={{borderRadius: 7}}>
+                      <View style={{height: 100, borderRadius: 10, padding: 8, width: '20%'}}>
+                        <ImageBackground source={{uri: l.image_url}} style={{height: '100%'}} imageStyle={{borderRadius: 7}}>
                         </ImageBackground>
                       </View>
-                      <View style={{paddingRight: 20}}>
+                      <View style={{paddingRight: 20, width: '80%'}}>
                         <Text style={{padding: 8, fontWeight: 'bold', color: '#009789'}}>{l.name}</Text>
                         <Text style={{padding: 8, color: 'grey'}}>{l.description.substring(0, 50)+'...'}</Text>
                       </View>

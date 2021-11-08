@@ -18,20 +18,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default class Article extends React.PureComponent {
 
-  static navigationOptions = ({navigation, screenProps}) => {
-
-    console.log(navigation.state.params);
-    const params = navigation.state.params || {};
-
-    return {
-      title:  params.title,
-      headerLeft:  null,
-      //headerRight: () => params.headerRight,
-      headerStyle: {
-        backgroundColor: '#D30068',
-      },
-    }
-  }
+  //static navigationOptions = ({ navigation }) => {
+  //    const { params } = navigation.state;
+  //    return params;
+  //}
 
   constructor(props) {
       super(props);
@@ -45,9 +35,6 @@ export default class Article extends React.PureComponent {
 
   _setNavigationParams() {
     let title       = 'Запись';
-    this.props.navigation.setParams({
-      title,
-    });
   }
 
   componentDidMount(){

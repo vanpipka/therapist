@@ -10,7 +10,8 @@ export default class Dialogs extends React.Component {
   constructor(props) {
     super(props);
     this._LoadDataAsync_1 = this._LoadDataAsync_1.bind(this);
-
+    console.log("DialogsScreen ");
+    console.log(props);
     this.state = {
       user: props.route.params,
       dialogs: [],

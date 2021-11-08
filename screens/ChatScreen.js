@@ -5,8 +5,6 @@ import * as firebase from 'firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { ConvertDateToString, ConvertStringToDate } from '../components/WebAPI';
 
-
-
 export default class Chat extends React.Component {
 
   constructor(props) {
@@ -22,8 +20,6 @@ export default class Chat extends React.Component {
       error: false,
       messages: [],
     }
-
-    console.log(this.state);
 
   };
 
@@ -201,6 +197,11 @@ export default class Chat extends React.Component {
     console.log(this.state.dialog);
     return (
       <GiftedChat
+        locale = "ru"
+        timeFormat = "hh:mm"
+        dateFormat = "D.MM.YY"
+        multiline = {true}
+        placeholder = "Ваше сообщение..."
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         user={{

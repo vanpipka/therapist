@@ -21,8 +21,8 @@ export default class Login extends React.PureComponent {
       const { navigation } = this.props;
 
       this.state={
-        email: 'vanpipka@gmail.com',
-        password: 'knidasew',
+        email: '',
+        password: '',
         errors: "",
         loading: false,
       };
@@ -31,12 +31,31 @@ export default class Login extends React.PureComponent {
 
   componentDidMount(){
 
+      this._getUserInfo();
+
   }
+
+  _getUserInfo = async () => {
+
+    try {
+
+      let email = await AsyncStorage.getItem('user_email');
+      let password = await AsyncStorage.getItem('user_psw');
+
+      this.setState({email: email, password: password})
+
+    } catch (error) {
+
+    }
+
+  };
 
   _saveUser = async (user) => {
     try {
 
       console.log(user);
+      await AsyncStorage.setItem('user_email', this.state.email);
+      await AsyncStorage.setItem('user_psw', this.state.password);
       await AsyncStorage.setItem('user_id', user.id);
       await AsyncStorage.setItem('user_name', user.name);
       await AsyncStorage.setItem('user_avatar', user.avatar);
@@ -99,8 +118,8 @@ export default class Login extends React.PureComponent {
             <Card.Divider/>
 
             <Input
-               placeholder="8 (999) 900 90 90"
-               label="Номер телефона"
+               placeholder="email@google.com"
+               label="Email"
                value={this.state.email}
                onChangeText={value => this.setState({ email: value })}
             />
@@ -108,7 +127,7 @@ export default class Login extends React.PureComponent {
             <Input
                 placeholder="*********"
                 secureTextEntry={true}
-                label="Код подтверждения"
+                label="Пароль"
                 value={this.state.password}
                 onChangeText={value => this.setState({ password: value })}
             />

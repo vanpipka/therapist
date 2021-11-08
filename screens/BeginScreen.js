@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Image} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, Image, AsyncStorage} from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { Card, ListItem, Button, Icon, Text } from 'react-native-elements'
@@ -20,40 +20,63 @@ export default class Begin extends React.PureComponent {
   }
 
   componentDidMount(){
-    this.checkLogin();
+    this._checkLogin();
   }
 
-  checkLogin() {
+  _saveUser = async (user) => {
+    try {
+
+      await AsyncStorage.setItem('user_id', user.id);
+      await AsyncStorage.setItem('user_name', user.name);
+      await AsyncStorage.setItem('user_avatar', user.avatar);
+
+      this.props.navigation.replace('Main', {user: user});
+
+    } catch (error) {
+
+    }
+  };
+
+  _checkLogin = async () => {
 
     if (!firebase.apps.length) {
       let FIREBASECONFIG = Const.FIREBASECONFIG;
       firebase.initializeApp(FIREBASECONFIG);
     }
 
-  /*  const usersRef = firebase.firestore().collection('users');
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-          usersRef
-            .doc(user.uid)
-            .get()
-            .then((document) => {
-              const userData = document.data()
-              console.log('checkLogin----------------------------------------->>>>');
-              console.log(userData);
-              console.log('checkLogin----------------------------------------->>>>');
-              this.setState({loading: false})
-              if (userData != undefined){
-                this.props.navigation.navigate('Main', {user: userData})
-              }
+    let email = await AsyncStorage.getItem('user_email');
+    let password = await AsyncStorage.getItem('user_psw');
+
+    if (email != undefined) {
+
+      firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then((response) => {
+                const uid = response.user.uid
+                const usersRef = firebase.firestore().collection('users')
+                usersRef
+                    .doc(uid)
+                    .get()
+                    .then(firestoreDocument => {
+                        if (!firestoreDocument.exists) {
+                            alert("User does not exist anymore.")
+                            return;
+                        }
+                        const user = firestoreDocument.data();
+                        this._saveUser(user);
+                    })
+                    .catch(error => {
+                        alert(error)
+                    });
             })
-            .catch((error) => {
-              this.setState({loading: false})
-            });
-        } else {
-          this.setState({loading: false})
-        }
-      });*/
+            .catch(error => {
+                alert(error)
+            })
+
+    } else {
       this.setState({loading: false})
+    }
   }
 
   render() {
