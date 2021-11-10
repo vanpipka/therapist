@@ -8,6 +8,8 @@ import Urls from '../constants/Urls';
 import Const from '../constants/Const';
 import Colors from '../constants/Colors';
 import * as firebase from 'firebase';
+import { _getUserIDFromAsyncStorage, ConvertDateToString } from '../components/WebAPI';
+import { v4 as uuidv4 } from 'uuid';
 //import auth from '@react-native-firebase/auth';
 //import Urls from '../constants/Urls';
 //import { GetQueryResult, AssetExample } from '../components/WebAPI';
@@ -60,6 +62,8 @@ export default class Test extends React.PureComponent {
   componentDidMount(){
     this._setNavigationParams();
 
+    //
+    _getUserIDFromAsyncStorage().then((result) => {this.setState({user: result});});
     // calculate max score
     let maxScore = 0;
     let data = this.state.data.questions;
@@ -108,6 +112,35 @@ export default class Test extends React.PureComponent {
 
   _closeTest() {
     this.setState({showQuestion: true})
+  }
+
+  _saveTest() {
+    let database  = firebase.firestore();
+
+    let quantity = 0;
+    let arr = this.state.data.questions;
+
+    for (var i = 0; i < arr.length; i++) {
+      quantity += arr[i]["answers"][arr[i]["result"]]["score"]
+    }
+
+    let data = {
+            user: this.state.user,
+            date: ConvertDateToString(new Date()),
+            score: quantity,
+            test: ""+this.state.data.id,
+    }
+    database.collection("testResult").doc(''+uuidv4()).set(data).then(() => {
+        /*  data['createdAt'] = GetDateView(ConvertStringToDate(data.date))
+          this.state.comments.push(data);*/
+          this.props.navigation.goBack();
+      })
+      .catch((error) => {
+          Alert.alert("Ошибка", "Не удалось сохранить результат теста");
+      });
+
+
+
   }
 
 
@@ -166,6 +199,7 @@ export default class Test extends React.PureComponent {
       let progress       = 0;
       let question       = {};
 
+      question = undefined;
       if (questionsArray.length >= questionId) {
           question = questionsArray[questionId]
           progress = (questionId)*100/questionsArray.length/100;
@@ -262,19 +296,56 @@ export default class Test extends React.PureComponent {
 
         let quantity = 0;
         let result = "";
+        let result_description = "";
         let arr = this.state.data.questions;
         let arr_result = this.state.data.result;
+        let scoreScale = [];
         for (var i = 0; i < arr.length; i++) {
           quantity += arr[i]["answers"][arr[i]["result"]]["score"]
         }
 
         for (var i = 0; i < arr_result.length; i++) {
+
+          let prsnt = arr_result[i]["to"] * 100 / this.state.maxScore;
+
+          let color = "rgba(10, 225, 20, 1)";
+          if (prsnt>80) {
+              color = "rgba(255, 10, 10, 1)";
+          }else if (prsnt>60) {
+              color = "rgba(255, 200, 0, 1)";
+          }else if (prsnt>40) {
+              color = "rgba(250, 225, 0, 1)";
+          }else if (prsnt>=20) {
+              color = "rgba(180, 225, 10, 1)";
+          };
+
+          scoreScale.push(
+            <View key={i} style={{flexDirection: "row", marginBottom: 4}}>
+              <View style={{backgroundColor: color, borderRadius: 4, padding: 4}}>
+                <Text key={i}>{arr_result[i]["from"]}-{arr_result[i]["to"]}</Text>
+              </View>
+              <Text style={{marginLeft: 4}}>{arr_result[i]["text"]}</Text>
+            </View>
+            )
+
           if (quantity >= arr_result[i]["from"] && quantity<= arr_result[i]["to"]) {
-                result = arr_result[i]["text"]
+              result = arr_result[i]["text"]
+              result_description = arr_result[i]["description"]
           }
         }
 
         let persent = quantity * 100 / this.state.maxScore;
+        let img = require('../assets/img/doctor.png');
+        let color = "rgba(10, 225, 20, 1)";
+        if (persent>=80) {
+            color = "rgba(255, 10, 10, 1)";
+        }else if (persent>=60) {
+            color = "rgba(255, 200, 0, 1)";
+        }else if (persent>=40) {
+            color = "rgba(250, 225, 0, 1)";
+        }else if (persent>=20) {
+            color = "rgba(180, 225, 10, 1)";
+        };
 
         return (
           <View style = {{flex:1}}>
@@ -283,27 +354,59 @@ export default class Test extends React.PureComponent {
             </SafeAreaInsetsContext.Consumer>
             <ScrollView>
               <View key={'1'} style={{padding: 8}}>
-                <View style={{marginTop: 8, height: 200, borderColor: "green", borderWidth: 2, borderRadius: 10}}>
-                    <Text>{data.name}</Text>
-                    <Text>Дата: {new Date().toString()}</Text>
-                </View>
-                <Text style={{color: "#009789", fontSize: 18, margin: 8}}>Ваш результат</Text>
-                <ProgressCircle
-                    percent={persent}
-                    radius={50}
-                    borderWidth={8}
-                    color="#3399FF"
-                    shadowColor="#999"
-                    bgColor="#fff"
-                >
-                    <Text style={{ fontSize: 18 }}>{quantity}/{this.state.maxScore}</Text>
-                </ProgressCircle>
-                <Text style={{color: "#009789", fontSize: 18, margin: 8}}>{result}</Text>
+                <Card containerStyle={{borderRadius: 10, margin: 4, backgroundColor: "#d0f9f6"}}>
+                  <Text style={{fontSize: 18, fontWeight: "bold", color: "#009789", margin: 0}}>{data.name}</Text>
+                  <View style={{flexDirection: "row", padding: 8}}>
+                    <View style={{height: 200, width: '50%', flex: 1, justifyContent: "center", alignItems: "center"}}>
+                        <ProgressCircle
+                          percent={persent}
+                          radius={50}
+                          borderWidth={10}
+                          color={color}
+                          shadowColor="#c2c2c2"
+                          bgColor="#fff"
+                          >
+                          <View style={{flexDirection: "row"}}>
+                            <Text style={{ fontSize: 32, fontWeight: "bold", color: color}}>{quantity}</Text>
+                            <Text style={{ fontSize: 14, color: "grey", marginTop: 18}}>/{this.state.maxScore}</Text>
+                          </View>
+                        </ProgressCircle>
+                    </View>
+
+                    <View style={{height: 200, width: '50%'}}>
+                      <ImageBackground source={img} style={styles.image}>
+                      </ImageBackground>
+                    </View>
+                  </View>
+
+                  <Card containerStyle={{borderRadius: 10, backgroundColor: "#0AE1B1", margin: 0, borderColor: "#20b795"}}>
+                    <Text style={{color: "#272727", fontWeight: "700"}}>{result}</Text>
+                    <Text style={{color: "grey", fontWeight: "700"}}>{result_description}</Text>
+                  </Card>
+
+                </Card>
+
+                <Card containerStyle={{borderRadius: 10, backgroundColor: "#FF63AE", margin: 4, marginTop: 16, borderColor: "#DD3686"}}>
+                  <TouchableOpacity
+                    style={{position: 'absolute', right: 0, top: 0, backgroundColor: "white", borderRadius: 50}}
+                    onPress={()=>{}}>
+                    <Icon
+                      name='close'
+                      color='grey'
+                      />
+                  </TouchableOpacity>
+                  <Text style={{color: "white", width: "90%"}}>ПОМНИТЕ! Ни один тест не является полностью точным. Вы всегда должны консультироваться со своим врачом при принятии решений о своем здоровье.</Text>
+                </Card>
+
+                <Card containerStyle={{borderRadius: 10, margin: 4, marginTop: 16}}>
+                  {scoreScale}
+                </Card>
+
               </View>
             </ScrollView>
             <View style = {{margin: 8}}>
                 <TouchableOpacity style = {styles.redSection}
-                  onPress={() => {this.props.navigation.goBack()}}>
+                  onPress={() => {this._saveTest()}}>
                   <Text style = {{color: 'white', fontWeight: 'bold'}}>Завершить</Text>
                 </TouchableOpacity>
             </View>

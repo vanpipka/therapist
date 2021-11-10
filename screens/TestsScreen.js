@@ -34,7 +34,6 @@ export default class TestsList extends React.PureComponent {
 
       console.log('TEST SCREEN CONSTRUCTOR');
 
-      console.log(props.route.params);
       this.state={
           data: props.route.params,
           loading: true
@@ -86,7 +85,7 @@ export default class TestsList extends React.PureComponent {
               data['id'] = doc.id;
               dataArray.push(data);
             });
-    console.log(dataArray);
+
     this.setState({testList: dataArray, loading: false})
 
   }
