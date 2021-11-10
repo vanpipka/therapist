@@ -21,9 +21,9 @@ export default class Register extends React.PureComponent {
       const { navigation } = this.props;
 
       this.state={
-        email: 'vanpipka@gmail.com',
-        password: 'knidasew',
-        confirmPassword: 'knidasew',
+        email: '',
+        password: '',
+        confirmPassword: '',
         errors: "",
         loading: false,
       };
