@@ -90,25 +90,28 @@ export default class Begin extends React.PureComponent {
       return (
         <View style={styles.container}>
           <View style={{alignItems: 'center', height: 40}}>
-            <Icon
-              name='people'
-              color={Colors.colors.mainGreen} />
+            <Image source={require('../assets/img/logo_mini.png')} style={{resizeMode: "stretch",
+              justifyContent: "center",
+              alignItems: "center",
+              width: 47,
+              height: 30}}/>
           </View>
           <Swiper style={styles.wrapper}
             activeDotColor={Colors.colors.mainGreen}>
             <View style={styles.slide1}>
               <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                <Text h4 style={{color: '#666666'}}>Инструменты для раскрытия</Text>
-                <Text h4 style={{color: '#666666'}}>Вашего потенциала </Text>
+                <Text h4 style={{color: Colors.colors.mainGreen}}>Обрети гармонию</Text>
                 <Image source={require('../assets/img/step1.png')} style={styles.image}/>
 
               </View>
             </View>
             <View style={styles.slide2}>
-              <Text style={styles.text}>Beautiful</Text>
+              <Text h4 style={{color: Colors.colors.mainGreen}}>Делись эмоциями</Text>
+              <Image source={require('../assets/img/step2.png')} style={styles.image}/>
             </View>
             <View style={styles.slide3}>
-              <Text style={styles.text}>And simple</Text>
+              <Text h4 style={{color: Colors.colors.mainGreen}}>Узнай себя</Text>
+              <Image source={require('../assets/img/step3.png')} style={styles.image}/>
             </View>
           </Swiper>
           <View style={{height: 100, marginTop: 8}}>

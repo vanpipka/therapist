@@ -109,7 +109,7 @@ export default class ArticleItem extends React.PureComponent {
                   <Avatar size="small" source={require('../assets/img/add_item.png')}/>
                   <View>
                     <Text style={{marginLeft: 8, color: 'grey', fontWeight:'700'}}>Что в твоей голове?</Text>
-                    <Text style={{marginLeft: 8, color: '#009789'}}>Вдохновляй других, получай поддержку</Text>
+                    <Text style={{marginLeft: 8, color: '#009789'}}>Напиши что тебя беспокоит и обязательно получишь поддержку!</Text>
                   </View>
                 </View>
               </View>
